@@ -70,6 +70,6 @@ fabric.properties
 *.class
 *.log
 
-
+.idea/
 # End of https://www.gitignore.io/api/scala,intellij
 
