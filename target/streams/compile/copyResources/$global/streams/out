@@ -1,6 +1,0 @@
-[0m[[0m[0mdebug[0m] [0m[0mCopy resource mappings: [0m
-[0m[[0m[0mdebug[0m] [0m[0m	(/Users/alexandrustana/Work/Learning/Personal/quickstart/src/main/resources/logback.xml,/Users/alexandrustana/Work/Learning/Personal/quickstart/target/scala-2.12/classes/logback.xml)[0m
-[0m[[0m[0mdebug[0m] [0m[0m	(/Users/alexandrustana/Work/Learning/Personal/quickstart/src/main/resources/db,/Users/alexandrustana/Work/Learning/Personal/quickstart/target/scala-2.12/classes/db)[0m
-[0m[[0m[0mdebug[0m] [0m[0m	(/Users/alexandrustana/Work/Learning/Personal/quickstart/src/main/resources/reference.conf,/Users/alexandrustana/Work/Learning/Personal/quickstart/target/scala-2.12/classes/reference.conf)[0m
-[0m[[0m[0mdebug[0m] [0m[0m	(/Users/alexandrustana/Work/Learning/Personal/quickstart/src/main/resources/db/migration,/Users/alexandrustana/Work/Learning/Personal/quickstart/target/scala-2.12/classes/db/migration)[0m
-[0m[[0m[0mdebug[0m] [0m[0m	(/Users/alexandrustana/Work/Learning/Personal/quickstart/src/main/resources/db/migration/V0_0_1__InitialDatabaseSetup.sql,/Users/alexandrustana/Work/Learning/Personal/quickstart/target/scala-2.12/classes/db/migration/V0_0_1__InitialDatabaseSetup.sql)[0m
