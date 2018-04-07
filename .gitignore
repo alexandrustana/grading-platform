@@ -72,6 +72,8 @@ fabric.properties
 
 .idea/
 /target/*
+/project/project/*
+/project/target/*
 .DS_Store
 # End of https://www.gitignore.io/api/scala,intellij
 
