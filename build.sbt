@@ -16,29 +16,32 @@ val ScalaTestVersion  = "3.0.4"
 val FlywayVersion     = "4.2.0"
 val PureConfigVersion = "0.9.0"
 val MySQLVersion      = "5.1.12"
+val Elastic4sVersion  = "6.1.2"
 
 libraryDependencies ++= Seq(
-  "org.typelevel"         %% "cats-core"            % CatsVersion,
-  "io.circe"              %% "circe-generic"        % CirceVersion,
-  "io.circe"              %% "circe-literal"        % CirceVersion,
-  "io.circe"              %% "circe-generic-extras" % CirceVersion,
-  "io.circe"              %% "circe-optics"         % CirceVersion,
-  "io.circe"              %% "circe-parser"         % CirceVersion,
-  "io.circe"              %% "circe-java8"          % CirceVersion,
-  "org.tpolecat"          %% "doobie-core"          % DoobieVersion,
-  "org.tpolecat"          %% "doobie-h2"            % DoobieVersion,
-  "org.tpolecat"          %% "doobie-scalatest"     % DoobieVersion,
-  "org.tpolecat"          %% "doobie-hikari"        % DoobieVersion,
-  "com.h2database"        %  "h2"                   % H2Version,
-  "org.http4s"            %% "http4s-blaze-server"  % Http4sVersion,
-  "org.http4s"            %% "http4s-circe"         % Http4sVersion,
-  "org.http4s"            %% "http4s-dsl"           % Http4sVersion,
-  "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
-  "org.flywaydb"          %  "flyway-core"          % FlywayVersion,
-  "com.github.pureconfig" %% "pureconfig"           % PureConfigVersion,
-  "mysql"                 % "mysql-connector-java"  % MySQLVersion,
-  "org.scalacheck"        %% "scalacheck"           % ScalaCheckVersion % Test,
-  "org.scalatest"         %% "scalatest"            % ScalaTestVersion  % Test
+  "org.typelevel"           %% "cats-core"            % CatsVersion,
+  "io.circe"                %% "circe-generic"        % CirceVersion,
+  "io.circe"                %% "circe-literal"        % CirceVersion,
+  "io.circe"                %% "circe-generic-extras" % CirceVersion,
+  "io.circe"                %% "circe-optics"         % CirceVersion,
+  "io.circe"                %% "circe-parser"         % CirceVersion,
+  "io.circe"                %% "circe-java8"          % CirceVersion,
+  "org.tpolecat"            %% "doobie-core"          % DoobieVersion,
+  "org.tpolecat"            %% "doobie-h2"            % DoobieVersion,
+  "org.tpolecat"            %% "doobie-scalatest"     % DoobieVersion,
+  "org.tpolecat"            %% "doobie-hikari"        % DoobieVersion,
+  "com.h2database"          %  "h2"                   % H2Version,
+  "org.http4s"              %% "http4s-blaze-server"  % Http4sVersion,
+  "org.http4s"              %% "http4s-circe"         % Http4sVersion,
+  "org.http4s"              %% "http4s-dsl"           % Http4sVersion,
+  "ch.qos.logback"          %  "logback-classic"      % LogbackVersion,
+  "org.flywaydb"            %  "flyway-core"          % FlywayVersion,
+  "com.github.pureconfig"   %% "pureconfig"           % PureConfigVersion,
+  "mysql"                   % "mysql-connector-java"  % MySQLVersion,
+  "com.sksamuel.elastic4s"  %% "elastic4s-core"       % Elastic4sVersion,
+  "com.sksamuel.elastic4s"  %% "elastic4s-http"       % Elastic4sVersion,
+  "org.scalacheck"          %% "scalacheck"           % ScalaCheckVersion % Test,
+  "org.scalatest"           %% "scalatest"            % ScalaTestVersion  % Test
 )
 
 
