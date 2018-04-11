@@ -3,8 +3,9 @@ package com.local.quickstart
 import cats.effect._
 import com.local.quickstart.config.{DatabaseConfig, QuickstartConfig}
 import com.local.quickstart.domain.account.{AccountService, AccountValidationInterpreter}
-import com.local.quickstart.infrastructure.endpoint.{AccountEndpoints, TestEndpoint}
+import com.local.quickstart.infrastructure.endpoint.AccountEndpoints
 import com.local.quickstart.infrastructure.repository.doobie.DoobieAccountRepositoryInterpreter
+import com.local.quickstart.infrastructure.repository.elastic.ElasticAccountRepositoryInterpreter
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
 import org.http4s.server.blaze.BlazeBuilder
@@ -23,10 +24,12 @@ object Server extends StreamApp[IO] {
     for {
       conf <- Stream.eval(QuickstartConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
-      _    <- Stream.eval(DatabaseConfig.initializeDb(conf.db, xa))
-      accountRepo       = DoobieAccountRepositoryInterpreter[F](xa)
-      accountValidation = AccountValidationInterpreter[F](accountRepo)
-      accountService    = AccountService[F](accountRepo, accountValidation)
+      _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
+      edb  <- Stream.eval(DatabaseConfig.initializeElasticDb(conf.db))
+      elasticAccountRepo   = ElasticAccountRepositoryInterpreter[F](edb)
+      sqlAccountRepo       = DoobieAccountRepositoryInterpreter[F](xa)
+      accountValidation = AccountValidationInterpreter[F](sqlAccountRepo)
+      accountService    = AccountService[F](sqlAccountRepo, accountValidation)
       exitCode <- BlazeBuilder[F]
         .bindHttp(8080, "localhost")
         .mountService(AccountEndpoints(accountService), "/")

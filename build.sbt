@@ -38,7 +38,6 @@ libraryDependencies ++= Seq(
   "org.flywaydb"            %  "flyway-core"          % FlywayVersion,
   "com.github.pureconfig"   %% "pureconfig"           % PureConfigVersion,
   "mysql"                   % "mysql-connector-java"  % MySQLVersion,
-  "com.sksamuel.elastic4s"  %% "elastic4s-core"       % Elastic4sVersion,
   "com.sksamuel.elastic4s"  %% "elastic4s-http"       % Elastic4sVersion,
   "org.scalacheck"          %% "scalacheck"           % ScalaCheckVersion % Test,
   "org.scalatest"           %% "scalatest"            % ScalaTestVersion  % Test
