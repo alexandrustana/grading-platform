@@ -4,8 +4,6 @@ import cats.Monad
 import cats.effect.Effect
 import com.local.quickstart.domain.account.{Account, AccountRepositoryAlgebra}
 import com.sksamuel.elastic4s.http._
-import io.circe._
-import io.circe.generic.semiauto._
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -14,12 +12,8 @@ import io.circe.generic.semiauto._
 class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient)(implicit E: Effect[F])
     extends AccountRepositoryAlgebra[F] {
 
-  import com.local.quickstart.domain.util.ToMap._
-  import com.local.quickstart.domain.util.MapTo._
+  import com.local.quickstart.domain.util.MapT.{mapToOps, toMapOps}
   import com.sksamuel.elastic4s.http.ElasticDsl._
-
-  implicit val accountDecoder: Decoder[Account] = deriveDecoder[Account]
-  implicit val accountEncoder: Encoder[Account] = deriveEncoder[Account]
 
   override def findByEmail(email: String): F[Option[Account]] =
     edb.execute {
@@ -27,12 +21,12 @@ class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient)(implicit
     }.await match {
       case Left(e) => throw new Exception(e.error.reason)
       case Right(v) =>
-        E.pure(Option(v.result.hits.hits(0).sourceAsMap.toMap[Account]))
+        E.pure(Option(v.result.hits.hits(0).sourceAsMap.mapTo[Account]))
     }
 
   override def create(o: Account): F[Account] =
     edb.execute {
-      index("account" -> "type") fields o.toMap
+      index("account" -> "type") fields o.toMap[Map[String, Any]]
     }.await match {
       case Left(e)  => throw new Exception(e.error.reason)
       case Right(_) => E.pure(o)
