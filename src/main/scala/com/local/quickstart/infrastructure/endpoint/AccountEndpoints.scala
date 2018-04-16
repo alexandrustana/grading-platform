@@ -18,7 +18,8 @@ import scala.language.higherKinds
   */
 class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
 
-  implicit val accountDecoder: EntityDecoder[F, Account] = jsonOf[F, Account]
+  implicit val accountDecoder: EntityDecoder[F, Account]           = jsonOf[F, Account]
+  implicit val accountListDecoder: EntityDecoder[F, List[Account]] = jsonOf[F, List[Account]]
 
   private def createUser(accountService: AccountService[F]): HttpService[F] =
     HttpService[F] {
@@ -31,14 +32,23 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         action.flatMap {
           case Right(saved) => Ok(saved.asJson)
           case Left(AccountAlreadyExistsError(existing)) =>
-            Conflict(
-              s"The user with user name ${existing.email} already exists")
+            Conflict(s"The user with user name ${existing.email} already exists")
 
         }
     }
 
+  private def getUsers(accountService: AccountService[F]): HttpService[F] =
+    HttpService[F] {
+      case GET -> Root / "account" =>
+        accountService.getAll.value.flatMap {
+          case Right(result) => Ok(result.asJson)
+          case Left(e)       => InternalServerError(s"An error occurred while trying to retrieve the data: $e")
+        }
+    }
+
   def endpoints(accountService: AccountService[F]): HttpService[F] =
-    createUser(accountService)
+    createUser(accountService) <+>
+      getUsers(accountService)
 }
 
 object AccountEndpoints {

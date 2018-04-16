@@ -8,4 +8,5 @@ import scala.language.higherKinds
   */
 trait GenericRepositoryAlgebra[F[_], A] {
   def create(o: A): F[A]
+  def getAll: F[List[A]]
 }

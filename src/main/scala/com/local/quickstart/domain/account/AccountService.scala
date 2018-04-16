@@ -17,6 +17,8 @@ class AccountService[F[_]](accountRepo: AccountRepositoryAlgebra[F],
       _     <- validation.doesNotExist(o)
       saved <- EitherT.liftF(accountRepo.create(o))
     } yield saved
+
+  override def getAll(implicit M: Monad[F]): EitherT[F, _, List[Account]] = EitherT.liftF(accountRepo.getAll)
 }
 
 object AccountService {

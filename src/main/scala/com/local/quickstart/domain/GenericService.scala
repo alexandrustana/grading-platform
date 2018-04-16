@@ -10,4 +10,6 @@ import cats.data._
 trait GenericService[F[_], A] {
 
   def create(o: A)(implicit M: Monad[F]): EitherT[F,_, A]
+
+  def getAll(implicit M: Monad[F]): EitherT[F, _, List[A]]
 }

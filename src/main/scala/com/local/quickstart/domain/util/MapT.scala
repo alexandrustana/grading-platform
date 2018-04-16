@@ -10,6 +10,7 @@ trait MapT[A, B] {
   def toMap(a: A): B
 }
 object MapT {
+
   implicit class toMapOps[A](a: A) {
     def toMap[B](implicit m: MapT[A, B]): B = m.toMap(a)
   }
@@ -19,10 +20,12 @@ object MapT {
   }
 
   implicit val accountToMap: MapT[Account, Map[String, Any]] = (a: Account) =>
-    (Map[String, Any]() /: a.getClass.getDeclaredFields) { (m, f) =>
-      f.setAccessible(true)
-      m + (f.getName -> f.get(a))
-  }
+    Map("id"        -> a.id.get,
+        "firstName" -> a.firstName,
+        "lastName"  -> a.lastName,
+        "email"     -> a.email,
+        "password"  -> a.password)
+
   implicit val mapToAccount: MapT[Map[String, AnyRef], Account] = (a: Map[String, AnyRef]) =>
     Account(
       Option(a("id").toString.toLong),
@@ -31,4 +34,8 @@ object MapT {
       a("email").toString,
       a("password").toString
   )
+
+  implicit val mapToAccountList: MapT[List[Map[String, AnyRef]], List[Account]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Account])
+
 }

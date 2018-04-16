@@ -5,6 +5,7 @@ import cats.implicits._
 import com.local.quickstart.domain.account.{Account, AccountRepositoryAlgebra}
 import doobie._
 import doobie.implicits._
+import tsec.passwordhashers.imports.BCrypt
 
 import scala.language.higherKinds
 
@@ -19,7 +20,7 @@ private object AccountSQL {
           VALUES(${account.firstName},
                   ${account.lastName},
                   ${account.email},
-                  ${sha256Hash(account.password)})
+                  ${BCrypt.hashpwUnsafe(account.password).repr})
        """.update
 
   def byEmail(email: String): Query0[Account] =
@@ -29,12 +30,11 @@ private object AccountSQL {
          WHERE EMAIL = $email
        """.query[Account]
 
-  private def sha256Hash(text: String): String =
-    String.format("%064x",
-                  new java.math.BigInteger(1,
-                                           java.security.MessageDigest
-                                             .getInstance("SHA-256")
-                                             .digest(text.getBytes("UTF-8"))))
+  def selectAll: Query0[Account] =
+    sql"""
+         SELECT ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD
+         FROM ACCOUNT
+       """.query[Account]
 }
 
 class DoobieAccountRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
@@ -49,6 +49,8 @@ class DoobieAccountRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
 
   override def findByEmail(email: String): F[Option[Account]] =
     byEmail(email).option.transact(xa)
+
+  override def getAll: F[List[Account]] = selectAll.to[List].transact(xa)
 }
 
 object DoobieAccountRepositoryInterpreter {

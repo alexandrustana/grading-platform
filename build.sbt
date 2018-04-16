@@ -17,6 +17,7 @@ val FlywayVersion     = "4.2.0"
 val PureConfigVersion = "0.9.0"
 val MySQLVersion      = "5.1.12"
 val Elastic4sVersion  = "6.1.2"
+val TsecVersion = "0.0.1-M6"
 
 libraryDependencies ++= Seq(
   "org.typelevel"           %% "cats-core"            % CatsVersion,
@@ -39,6 +40,7 @@ libraryDependencies ++= Seq(
   "com.github.pureconfig"   %% "pureconfig"           % PureConfigVersion,
   "mysql"                   % "mysql-connector-java"  % MySQLVersion,
   "com.sksamuel.elastic4s"  %% "elastic4s-http"       % Elastic4sVersion,
+  "io.github.jmcardon"      %% "tsec-password"        % TsecVersion,
   "org.scalacheck"          %% "scalacheck"           % ScalaCheckVersion % Test,
   "org.scalatest"           %% "scalatest"            % ScalaTestVersion  % Test
 )
@@ -93,7 +95,6 @@ scalacOptions ++= Seq(
   "-Ywarn-value-discard"               // Warn when non-Unit expression results are unused.
   // format: on
 )
-
 // Filter out compiler flags to make the repl experience functional...
 val badConsoleFlags = Seq("-Xfatal-warnings", "-Ywarn-unused:imports")
 scalacOptions in (Compile, console) ~= (_.filterNot(badConsoleFlags.contains(_)))
