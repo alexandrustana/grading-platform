@@ -17,7 +17,7 @@ object AccountModelChecker {
 
   private val checkName = checkPred(longerThan(3) and alpha)
 
-  private val checkPassoword = checkPred(
+  private val checkPassword = checkPred(
     longerThan(6) and
       Predicate.lift(error("Must contain at least an uppercase letter"),
                      str => str.exists(_.isUpper)) and
@@ -50,5 +50,5 @@ object AccountModelChecker {
      checkName.run(account.firstName),
      checkName.run(account.lastName),
      checkEmail.run(account.email),
-     checkPassoword.run(account.password)).mapN(Account)
+     checkPassword.run(account.password)).mapN(Account)
 }
