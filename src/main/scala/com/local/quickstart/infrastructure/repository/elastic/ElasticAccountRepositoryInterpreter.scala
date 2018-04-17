@@ -5,6 +5,7 @@ import cats.effect.Effect
 import com.local.quickstart.domain.account.{Account, AccountRepositoryAlgebra}
 import com.sksamuel.elastic4s.http._
 import tsec.passwordhashers.imports.BCrypt
+import com.local.quickstart.infrastructure.util.MapT._
 
 import scala.util.Random
 
@@ -15,7 +16,6 @@ import scala.util.Random
 class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient)(implicit E: Effect[F])
     extends AccountRepositoryAlgebra[F] {
 
-  import com.local.quickstart.domain.util.MapT.{mapToOps, toMapOps}
   import com.sksamuel.elastic4s.http.ElasticDsl._
 
   override def findByEmail(email: String): F[Option[Account]] =

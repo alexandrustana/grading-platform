@@ -1,4 +1,4 @@
-package com.local.quickstart.domain.util
+package com.local.quickstart.infrastructure.util
 
 import com.local.quickstart.domain.account.Account
 
