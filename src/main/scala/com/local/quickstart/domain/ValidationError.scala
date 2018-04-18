@@ -8,3 +8,4 @@ import com.local.quickstart.domain.account.Account
   */
 sealed trait ValidationError extends Product with Serializable
 case class AccountAlreadyExistsError(account: Account) extends ValidationError
+case class AccountInvalidModelError(errors: List[String]) extends ValidationError

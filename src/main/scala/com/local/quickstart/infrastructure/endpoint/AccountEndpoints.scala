@@ -1,6 +1,6 @@
 package com.local.quickstart.infrastructure.endpoint
 
-import com.local.quickstart.domain.AccountAlreadyExistsError
+import com.local.quickstart.domain.{AccountAlreadyExistsError, AccountInvalidModelError}
 import com.local.quickstart.domain.account.{Account, AccountService}
 import cats.effect.Effect
 import cats.implicits._
@@ -31,8 +31,13 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
 
         action.flatMap {
           case Right(saved) => Ok(saved.asJson)
-          case Left(AccountAlreadyExistsError(existing)) =>
-            Conflict(s"The user with user name ${existing.email} already exists")
+          case Left(error) =>
+            error match {
+              case AccountAlreadyExistsError(existing) =>
+                Conflict(s"The user with user name ${existing.email} already exists")
+              case AccountInvalidModelError(errors) =>
+                Conflict(s"The following errors have occurred when trying to save: ${errors.mkString(", ")}")
+            }
 
         }
     }
@@ -42,7 +47,8 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
       case GET -> Root / "account" =>
         accountService.getAll.value.flatMap {
           case Right(result) => Ok(result.asJson)
-          case Left(e)       => InternalServerError(s"An error occurred while trying to retrieve the data: $e")
+          case Left(e) =>
+            InternalServerError(s"An error occurred while trying to retrieve the data: $e")
         }
     }
 

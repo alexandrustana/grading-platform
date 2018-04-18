@@ -1,8 +1,7 @@
 package com.local.quickstart.domain.account
 
 import cats.data.EitherT
-import com.local.quickstart.domain.AccountAlreadyExistsError
-import com.local.quickstart.infrastructure.util.validation.Check.Errors
+import com.local.quickstart.domain.{AccountAlreadyExistsError, AccountInvalidModelError}
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -10,5 +9,5 @@ import com.local.quickstart.infrastructure.util.validation.Check.Errors
   */
 trait AccountValidationAlgebra[F[_]] {
   def doesNotExist(account: Account): EitherT[F, AccountAlreadyExistsError, Unit]
-  def checkModel(account: Account): EitherT[F, Errors, Account]
+  def checkModel(account: Account): EitherT[F, AccountInvalidModelError, Unit]
 }
