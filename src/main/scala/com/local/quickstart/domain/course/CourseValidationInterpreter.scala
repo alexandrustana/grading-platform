@@ -27,7 +27,7 @@ object CourseValidationInterpreter {
   def apply[F[_]: Monad](repo: CourseRepositoryAlgebra[F]): CourseValidationInterpreter[F] =
     new CourseValidationInterpreter[F](repo)
 
-  private val checkName = checkPred(longerThan(3)("Name") and alpha)
+  private val checkName = checkPred(longerThan(3)("Name") and alphanumeric)
 
 
   def checkModel(course: Course): Either[Errors, Course] =

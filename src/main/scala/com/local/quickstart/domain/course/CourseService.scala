@@ -22,4 +22,9 @@ class CourseService[F[_]](accountRepo: CourseRepositoryAlgebra[F],
     EitherT.liftF(accountRepo.getAll)
 }
 
+object CourseService {
+  def apply[F[_]](repositoryAlgebra: CourseRepositoryAlgebra[F],
+                  validationAlgebra: CourseValidationAlgebra[F]): CourseService[F] =
+    new CourseService[F](repositoryAlgebra, validationAlgebra)
+}
 

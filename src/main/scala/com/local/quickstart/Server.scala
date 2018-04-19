@@ -3,9 +3,10 @@ package com.local.quickstart
 import cats.effect._
 import com.local.quickstart.config.{DatabaseConfig, QuickstartConfig}
 import com.local.quickstart.domain.account.{AccountService, AccountValidationInterpreter}
-import com.local.quickstart.infrastructure.endpoint.AccountEndpoints
-import com.local.quickstart.infrastructure.repository.doobie.DoobieAccountRepositoryInterpreter
-import com.local.quickstart.infrastructure.repository.elastic.ElasticAccountRepositoryInterpreter
+import com.local.quickstart.domain.assignment.{AssignmentService, AssignmentValidationInterpreter}
+import com.local.quickstart.domain.course.{CourseService, CourseValidationInterpreter}
+import com.local.quickstart.infrastructure.endpoint.{AccountEndpoints, AssignmentEndpoints, CourseEndpoints}
+import com.local.quickstart.infrastructure.repository.doobie.{DoobieAccountRepositoryInterpreter, DoobieAssignmentRepositoryInterpreter, DoobieCourseRepositoryInterpreter}
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
 import org.http4s.server.blaze.BlazeBuilder
@@ -25,14 +26,20 @@ object Server extends StreamApp[IO] {
       conf <- Stream.eval(QuickstartConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
       _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
-      edb  <- Stream.eval(DatabaseConfig.initializeElasticDb(conf.db))
-      elasticAccountRepo   = ElasticAccountRepositoryInterpreter[F](edb)
       sqlAccountRepo       = DoobieAccountRepositoryInterpreter[F](xa)
-      accountValidation = AccountValidationInterpreter[F](sqlAccountRepo)
-      accountService    = AccountService[F](sqlAccountRepo, accountValidation)
+      sqlCourseRepo        = DoobieCourseRepositoryInterpreter[F](xa)
+      sqlAssignmentRepo    = DoobieAssignmentRepositoryInterpreter[F](xa)
+      accountValidation    = AccountValidationInterpreter[F](sqlAccountRepo)
+      courseValidation     = CourseValidationInterpreter[F](sqlCourseRepo)
+      assignmentValidation = AssignmentValidationInterpreter[F](sqlAssignmentRepo)
+      accountService       = AccountService[F](sqlAccountRepo, accountValidation)
+      courseService        = CourseService[F](sqlCourseRepo, courseValidation)
+      assignmentService    = AssignmentService[F](sqlAssignmentRepo, assignmentValidation)
       exitCode <- BlazeBuilder[F]
         .bindHttp(8080, "localhost")
         .mountService(AccountEndpoints(accountService), "/")
+        .mountService(CourseEndpoints(courseService), "/")
+        .mountService(AssignmentEndpoints(assignmentService), "/")
         .serve
     } yield exitCode
 }

@@ -29,7 +29,7 @@ object AssignmentValidationInterpreter {
 
   import com.local.quickstart.domain.course.CourseValidationInterpreter
 
-  private val checkName = checkPred(longerThan(3)("Name") and alpha)
+  private val checkName = checkPred(longerThan(3)("Name") and alphanumeric)
 
   def checkModel(assignment: Assignment): Either[Errors, Assignment] =
     (Either.right(assignment.id),

@@ -13,9 +13,17 @@ import scala.language.higherKinds
   * @since 07/04/2018
   */
 private object CourseSQL {
-  def insert(account: Course): Update0 = ???
+  def insert(course: Course): Update0 =
+    sql"""
+          INSERT INTO COURSE(NAME)
+          VALUES(${course.name})
+       """.update
 
-  def selectAll: Query0[Course] = ???
+  def selectAll: Query0[Course] =
+    sql"""
+         SELECT ID, NAME
+         FROM COURSE
+       """.query[Course]
 }
 
 class DoobieCourseRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
@@ -28,7 +36,7 @@ class DoobieCourseRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
       .map(id => o.copy(id = id.some))
       .transact(xa)
 
-  override def getAll: F[List[Course]] = ???
+  override def getAll: F[List[Course]] = selectAll.to[List].transact(xa)
 }
 
 object DoobieCourseRepositoryInterpreter {
