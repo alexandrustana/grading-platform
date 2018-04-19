@@ -3,7 +3,7 @@ package com.local.quickstart.domain.account
 import cats._
 import cats.data.EitherT
 import cats.implicits._
-import com.local.quickstart.domain.{AccountAlreadyExistsError, AccountInvalidModelError}
+import com.local.quickstart.domain.{AlreadyExistsError, InvalidModelError}
 import com.local.quickstart.infrastructure.util.validation.Check._
 import com.local.quickstart.infrastructure.util.validation.Check.CheckOps._
 import com.local.quickstart.infrastructure.util.validation.Predicate
@@ -17,21 +17,21 @@ class AccountValidationInterpreter[F[_]: Monad](accountRepo: AccountRepositoryAl
   override def doesNotExist(account: Account) = EitherT {
     accountRepo.findByEmail(account.email).map {
       case None    => Right(())
-      case Some(_) => Left(AccountAlreadyExistsError(account))
+      case Some(_) => Left(AlreadyExistsError(account))
     }
   }
 
   override def checkModel(account: Account) =
     EitherT.fromEither {
       AccountValidationInterpreter.checkModel(account) match {
-        case Left(value) => Left(AccountInvalidModelError(value.toList))
+        case Left(value) => Left(InvalidModelError(value.toList))
         case Right(_)    => Right(())
       }
     }
 }
 
 object AccountValidationInterpreter {
-  def apply[F[_]: Monad](repo: AccountRepositoryAlgebra[F]): AccountValidationAlgebra[F] =
+  def apply[F[_]: Monad](repo: AccountRepositoryAlgebra[F]): AccountValidationInterpreter[F] =
     new AccountValidationInterpreter[F](repo)
 
   private val checkName = checkPred(longerThan(3)("Name") and alpha)

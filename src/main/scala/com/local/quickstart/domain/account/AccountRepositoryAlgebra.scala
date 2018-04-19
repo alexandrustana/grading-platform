@@ -1,7 +1,6 @@
 package com.local.quickstart.domain.account
 
 import com.local.quickstart.domain.GenericRepositoryAlgebra
-import scala.language.higherKinds
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
