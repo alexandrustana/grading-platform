@@ -34,15 +34,15 @@ object AccountValidationInterpreter {
   def apply[F[_]: Monad](repo: AccountRepositoryAlgebra[F]): AccountValidationAlgebra[F] =
     new AccountValidationInterpreter[F](repo)
 
-  private val checkName = checkPred(longerThan(3) and alpha)
+  private val checkName = checkPred(longerThan(3)("Name") and alpha)
 
   private val checkPassword = checkPred(
-    longerThan(6) and
-      Predicate.lift(error("Must contain at least an uppercase letter"),
+    longerThan(6)("Password") and
+      Predicate.lift(error("The password must contain at least an uppercase letter"),
                      str => str.exists(_.isUpper)) and
-      Predicate.lift(error("Must contain at least a lowercase letter"),
+      Predicate.lift(error("The password must  contain at least a lowercase letter"),
                      str => str.exists(_.isLower)) and
-      Predicate.lift(error("Must contain at least a symbol or number"),
+      Predicate.lift(error("The password must  contain at least a symbol or a number"),
                      str => str.exists(!_.isLetter)))
 
   private val checkEmail: Check[String, String] = {
@@ -54,8 +54,8 @@ object AccountValidationInterpreter {
         case _ =>
           Left(error("Email must contain a single @ character"))
       })
-    val checkLeft  = checkPred(longerThan(0))
-    val checkRight = checkPred(longerThan(3) and contains('.'))
+    val checkLeft  = checkPred(longerThan(0)("Email"))
+    val checkRight = checkPred(longerThan(3)("Email") and contains('.'))
     val joinEmail: Check[(String, String), String] =
       check {
         case (l, r) => (checkLeft(l), checkRight(r)).mapN(_ + "@" + _)

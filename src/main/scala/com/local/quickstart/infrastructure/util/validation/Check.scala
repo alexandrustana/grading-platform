@@ -23,8 +23,8 @@ object Check {
 
   object CheckOps {
 
-    def longerThan(n: Int): Predicate[Errors, String] =
-      Predicate.lift(error(s"Must be longer than $n characters"), str => str.length > n)
+    def longerThan(n: Int)(field: String = ""): Predicate[Errors, String] =
+      Predicate.lift(error(s"${if(field.isEmpty) "Must" else s"$field must"} be longer than $n characters"), str => str.length > n)
 
     val alphanumeric: Predicate[Errors, String] =
       Predicate.lift(error(s"Must be all alphanumeric characters"),
