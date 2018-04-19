@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback"          %  "logback-classic"      % LogbackVersion,
   "org.flywaydb"            %  "flyway-core"          % FlywayVersion,
   "com.github.pureconfig"   %% "pureconfig"           % PureConfigVersion,
-  "mysql"                   % "mysql-connector-java"  % MySQLVersion,
+  "mysql"                   %  "mysql-connector-java" % MySQLVersion,
   "com.sksamuel.elastic4s"  %% "elastic4s-http"       % Elastic4sVersion,
   "io.github.jmcardon"      %% "tsec-password"        % TsecVersion,
   "org.scalacheck"          %% "scalacheck"           % ScalaCheckVersion % Test,
