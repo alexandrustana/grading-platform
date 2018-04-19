@@ -26,6 +26,8 @@ class AccountRepositoryInMemoryInterpreter[F[_]: Applicative] extends AccountRep
   }
 
   override def findByEmail(email: String): F[Option[Account]] = cache.values.find(o => o.email == email).pure[F]
+
+  override def getAll: F[List[Account]] = cache.values.toList.pure[F]
 }
 
 object AccountRepositoryInMemoryInterpreter {
