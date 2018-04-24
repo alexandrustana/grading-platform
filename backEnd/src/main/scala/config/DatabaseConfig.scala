@@ -10,13 +10,15 @@ import org.flywaydb.core.Flyway
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 06/04/2018
   */
-case class DatabaseConfig(host: String,
-                          port: Int,
-                          url: String,
-                          driver: String,
-                          user: String,
-                          password: String,
-                          clean: Boolean = false)
+case class DatabaseConfig(
+  host:     String,
+  port:     Int,
+  url:      String,
+  driver:   String,
+  user:     String,
+  password: String,
+  clean:    Boolean = false
+)
 
 object DatabaseConfig {
 
@@ -24,8 +26,7 @@ object DatabaseConfig {
     HikariTransactor
       .newHikariTransactor[F](dbConfig.driver, dbConfig.url, dbConfig.user, dbConfig.password)
 
-  def initializeSQLDb[F[_]](dbConfig: DatabaseConfig, xa: HikariTransactor[F])(
-    implicit S: Sync[F]): F[Unit] =
+  def initializeSQLDb[F[_]](dbConfig: DatabaseConfig, xa: HikariTransactor[F])(implicit S: Sync[F]): F[Unit] =
     if (dbConfig.url.contains(":mysql:")) {
       xa.configure { ds =>
         S.delay {
@@ -36,7 +37,8 @@ object DatabaseConfig {
           ()
         }
       }
-    } else {
+    }
+    else {
       S.pure(())
     }
 

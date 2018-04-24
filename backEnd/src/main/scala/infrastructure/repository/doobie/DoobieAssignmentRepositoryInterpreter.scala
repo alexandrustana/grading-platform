@@ -22,7 +22,7 @@ private object AssignmentSQL {
   def selectAll: Query0[(Assignment, Option[Course])] =
     sql"""
          SELECT A.ID, A.NAME
-         FROM ACCOUNT AS A
+         FROM ASSIGNMENT AS A
          INNER JOIN COURSE AS C ON A.ID_COURSE = C.ID
        """.query[(Assignment, Option[Course])]
 }

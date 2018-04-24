@@ -13,7 +13,7 @@ resolvers += "jmcardon at bintray" at "https://dl.bintray.com/jmcardon/tsec"
   *
   * https://github.com/scalameta/scalafmt
   */
-addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "1.4.0")
+addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "1.5.0")
 
 /**
   * Refactoring/linting tool for scala.
