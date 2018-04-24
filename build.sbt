@@ -2,8 +2,6 @@ import sbt._
 import sbtassembly.MergeStrategy
 import sbtassembly.PathList
 
-addAlias ("start-server", "backEnd/run")
-
 lazy val global = (project in file("."))
   .settings(commonsSettings)
   .aggregate(backEnd).dependsOn(backEnd)
