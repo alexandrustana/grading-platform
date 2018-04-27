@@ -12,11 +12,11 @@ import doobie.implicits._
   * @since 07/04/2018
   */
 private object AssignmentSQL {
+
   def insert(assignment: Assignment): Update0 =
     sql"""
           INSERT INTO ASSIGNMENT(ID_COURSE, NAME)
-          VALUES(${assignment.course.id},
-                  ${assignment.name})
+          VALUES (${assignment.course.get.id},${assignment.name})
        """.update
 
   def selectAll: Query0[(Assignment, Option[Course])] =
@@ -27,15 +27,18 @@ private object AssignmentSQL {
        """.query[(Assignment, Option[Course])]
 }
 
-class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
-    extends AssignmentRepositoryAlgebra[F] {
+class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends AssignmentRepositoryAlgebra[F] {
+
   import AssignmentSQL._
 
   override def create(o: Assignment): F[Assignment] =
-    insert(o)
-      .withUniqueGeneratedKeys[Long]("ID")
-      .map(id => o.copy(id = id.some))
-      .transact(xa)
+    o.course match {
+      case Some(_) =>
+        insert(o)
+          .withUniqueGeneratedKeys[Long]("ID")
+          .map(id => o.copy(id = id.some))
+          .transact(xa)
+    }
 
   override def getAll: F[List[Assignment]] =
     selectAll
@@ -44,14 +47,14 @@ class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
       .map(_.map {
         case (a, o) =>
           o match {
-            case Some(c) => a.copy(course = c)
+            case Some(c) => a.copy(course = Option(c))
             case None    => a
           }
       })
 }
 
 object DoobieAssignmentRepositoryInterpreter {
-  def apply[F[_]: Monad](
-      xa: Transactor[F]): DoobieAssignmentRepositoryInterpreter[F] =
+
+  def apply[F[_]: Monad](xa: Transactor[F]): DoobieAssignmentRepositoryInterpreter[F] =
     new DoobieAssignmentRepositoryInterpreter(xa)
 }

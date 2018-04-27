@@ -1,6 +1,7 @@
 package util
 
 import domain.account.Account
+import domain.assignment.Assignment
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -9,6 +10,7 @@ import domain.account.Account
 trait MapT[A, B] {
   def toMap(a: A): B
 }
+
 object MapT {
 
   implicit class toMapOps[A](a: A) {
@@ -20,11 +22,13 @@ object MapT {
   }
 
   implicit val accountToMap: MapT[Account, Map[String, Any]] = (a: Account) =>
-    Map("id" -> a.id.get,
-        "firstName" -> a.firstName,
-        "lastName" -> a.lastName,
-        "email" -> a.email,
-        "password" -> a.password)
+    Map(
+      "id"        -> a.id.get,
+      "firstName" -> a.firstName,
+      "lastName"  -> a.lastName,
+      "email"     -> a.email,
+      "password"  -> a.password
+  )
 
   implicit val mapToAccount: MapT[Map[String, AnyRef], Account] =
     (a: Map[String, AnyRef]) =>
@@ -34,10 +38,23 @@ object MapT {
         a("lastName").toString,
         a("email").toString,
         a("password").toString
-      )
+    )
 
-  implicit val mapToAccountList
-    : MapT[List[Map[String, AnyRef]], List[Account]] =
+  implicit val assignmentToMap: MapT[Assignment, Map[String, Any]] = (a: Assignment) =>
+    Map("id" -> a.id.get, "name" -> a.name)
+
+  implicit val mapToAssignment: MapT[Map[String, AnyRef], Assignment] =
+    (a: Map[String, AnyRef]) =>
+      Assignment(
+        Option(a("id").toString.toLong),
+        a("name").toString
+    )
+
+  implicit val mapToAccountList: MapT[List[Map[String, AnyRef]], List[Account]] =
     (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Account])
+
+
+  implicit val mapToAssignmentList: MapT[List[Map[String, AnyRef]], List[Assignment]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Assignment])
 
 }

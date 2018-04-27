@@ -11,8 +11,7 @@ import util.Check.CheckOps._
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 07/04/2018
   */
-class CourseValidationInterpreter[F[_]: Monad](
-    accountRepo: CourseRepositoryAlgebra[F])
+class CourseValidationInterpreter[F[_]: Monad](accountRepo: CourseRepositoryAlgebra[F])
     extends CourseValidationAlgebra[F] {
 
   override def checkModel(course: Course) =
@@ -25,8 +24,8 @@ class CourseValidationInterpreter[F[_]: Monad](
 }
 
 object CourseValidationInterpreter {
-  def apply[F[_]: Monad](
-      repo: CourseRepositoryAlgebra[F]): CourseValidationInterpreter[F] =
+
+  def apply[F[_]: Monad](repo: CourseRepositoryAlgebra[F]): CourseValidationInterpreter[F] =
     new CourseValidationInterpreter[F](repo)
 
   private val checkName = checkPred(longerThan(3)("Name") and alphanumeric)

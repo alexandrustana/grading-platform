@@ -11,8 +11,7 @@ import util.Check.CheckOps._
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 07/04/2018
   */
-class AssignmentValidationInterpreter[F[_]: Monad](
-    accountRepo: AssignmentRepositoryAlgebra[F])
+class AssignmentValidationInterpreter[F[_]: Monad](accountRepo: AssignmentRepositoryAlgebra[F])
     extends AssignmentValidationAlgebra[F] {
 
   override def checkModel(assignment: Assignment) =
@@ -25,16 +24,17 @@ class AssignmentValidationInterpreter[F[_]: Monad](
 }
 
 object AssignmentValidationInterpreter {
-  def apply[F[_]: Monad](repo: AssignmentRepositoryAlgebra[F])
-    : AssignmentValidationInterpreter[F] =
-    new AssignmentValidationInterpreter[F](repo)
 
-  import domain.course.CourseValidationInterpreter
+  def apply[F[_]: Monad](repo: AssignmentRepositoryAlgebra[F]): AssignmentValidationInterpreter[F] =
+    new AssignmentValidationInterpreter[F](repo)
 
   private val checkName = checkPred(longerThan(3)("Name") and alphanumeric)
 
   def checkModel(assignment: Assignment): Either[Errors, Assignment] =
-    (Either.right(assignment.id),
-     checkName(assignment.name),
-     CourseValidationInterpreter.checkModel(assignment.course)).mapN(Assignment)
+    /*_*/
+    (
+      Either.right(assignment.id),
+      checkName(assignment.name),
+      Either.right(assignment.course)
+    ).mapN(Assignment)
 }
