@@ -1,5 +1,5 @@
 import cats.effect._
-import config.{DatabaseConfig, QuickstartConfig}
+import config.{BackendConfig, DatabaseConfig}
 import domain.account.{AccountService, AccountValidationInterpreter}
 import domain.assignment.{AssignmentService, AssignmentValidationInterpreter}
 import domain.course.{CourseService, CourseValidationInterpreter}
@@ -21,7 +21,7 @@ object Server extends StreamApp[IO] {
 
   def createStream[F[_]](implicit E: Effect[F]): Stream[F, ExitCode] =
     for {
-      conf <- Stream.eval(QuickstartConfig.load[F])
+      conf <- Stream.eval(BackendConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
       _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
       sqlAccountRepo       = DoobieAccountRepositoryInterpreter[F](xa)

@@ -4,9 +4,12 @@ import sbtassembly.PathList
 
 lazy val global = (project in file("."))
   .settings(commonsSettings)
-  .aggregate(backEnd).dependsOn(backEnd)
-  .aggregate(frontEnd).dependsOn(frontEnd)
-  .aggregate(sqlEntriesGenerator).dependsOn(sqlEntriesGenerator)
+  .aggregate(backEnd)
+  .dependsOn(backEnd)
+  .aggregate(frontEnd)
+  .dependsOn(frontEnd)
+  .aggregate(sqlEntriesGenerator)
+  .dependsOn(sqlEntriesGenerator)
 
 lazy val backEnd = (project in file("backEnd"))
   .settings(commonsSettings)
@@ -19,8 +22,6 @@ lazy val frontEnd = (project in file("frontEnd"))
 lazy val sqlEntriesGenerator = (project in file("sqlEntriesGenerator"))
   .settings(commonsSettings)
   .settings(sbtAssemblySettings)
-
-
 
 val CatsVersion       = "1.1.0"
 val CatsEffect        = "0.10.1"
@@ -39,33 +40,33 @@ val TsecVersion       = "0.0.1-M6"
 
 def commonsSettings: Seq[Setting[_]] = Seq(
   scalaVersion := "2.12.5",
-  name := "grading-platform",
-  version := "0.0.1-SNAPSHOT",
+  name         := "grading-platform",
+  version      := "0.0.1-SNAPSHOT",
   libraryDependencies ++= Seq(
-    "org.typelevel"           %% "cats-core"            % CatsVersion               withSources (),
-    "org.typelevel"           %% "cats-effect"          % CatsEffect                withSources (),
-    "io.circe"                %% "circe-generic"        % CirceVersion              withSources (),
-    "io.circe"                %% "circe-literal"        % CirceVersion              withSources (),
-    "io.circe"                %% "circe-generic-extras" % CirceVersion              withSources (),
-    "io.circe"                %% "circe-optics"         % CirceVersion              withSources (),
-    "io.circe"                %% "circe-parser"         % CirceVersion              withSources (),
-    "io.circe"                %% "circe-java8"          % CirceVersion              withSources (),
-    "org.tpolecat"            %% "doobie-core"          % DoobieVersion             withSources (),
-    "org.tpolecat"            %% "doobie-h2"            % DoobieVersion             withSources (),
-    "org.tpolecat"            %% "doobie-scalatest"     % DoobieVersion             withSources (),
-    "org.tpolecat"            %% "doobie-hikari"        % DoobieVersion             withSources (),
-    "com.h2database"          %  "h2"                   % H2Version                 withSources (),
-    "org.http4s"              %% "http4s-blaze-server"  % Http4sVersion             withSources (),
-    "org.http4s"              %% "http4s-circe"         % Http4sVersion             withSources (),
-    "org.http4s"              %% "http4s-dsl"           % Http4sVersion             withSources (),
-    "ch.qos.logback"          %  "logback-classic"      % LogbackVersion            withSources (),
-    "org.flywaydb"            %  "flyway-core"          % FlywayVersion             withSources (),
-    "com.github.pureconfig"   %% "pureconfig"           % PureConfigVersion         withSources (),
-    "mysql"                   %  "mysql-connector-java" % MySQLVersion              withSources (),
-    "com.sksamuel.elastic4s"  %% "elastic4s-http"       % Elastic4sVersion          withSources (),
-    "io.github.jmcardon"      %% "tsec-password"        % TsecVersion               withSources (),
-    "org.scalacheck"          %% "scalacheck"           % ScalaCheckVersion % Test  withSources (),
-    "org.scalatest"           %% "scalatest"            % ScalaTestVersion  % Test  withSources (),
+    "org.typelevel"          %% "cats-core"            % CatsVersion       withSources (),
+    "org.typelevel"          %% "cats-effect"          % CatsEffect        withSources (),
+    "io.circe"               %% "circe-generic"        % CirceVersion      withSources (),
+    "io.circe"               %% "circe-literal"        % CirceVersion      withSources (),
+    "io.circe"               %% "circe-generic-extras" % CirceVersion      withSources (),
+    "io.circe"               %% "circe-optics"         % CirceVersion      withSources (),
+    "io.circe"               %% "circe-parser"         % CirceVersion      withSources (),
+    "io.circe"               %% "circe-java8"          % CirceVersion      withSources (),
+    "org.tpolecat"           %% "doobie-core"          % DoobieVersion     withSources (),
+    "org.tpolecat"           %% "doobie-h2"            % DoobieVersion     withSources (),
+    "org.tpolecat"           %% "doobie-scalatest"     % DoobieVersion     withSources (),
+    "org.tpolecat"           %% "doobie-hikari"        % DoobieVersion     withSources (),
+    "com.h2database"         % "h2"                    % H2Version         withSources (),
+    "org.http4s"             %% "http4s-blaze-server"  % Http4sVersion     withSources (),
+    "org.http4s"             %% "http4s-circe"         % Http4sVersion     withSources (),
+    "org.http4s"             %% "http4s-dsl"           % Http4sVersion     withSources (),
+    "ch.qos.logback"         % "logback-classic"       % LogbackVersion    withSources (),
+    "org.flywaydb"           % "flyway-core"           % FlywayVersion     withSources (),
+    "com.github.pureconfig"  %% "pureconfig"           % PureConfigVersion withSources (),
+    "mysql"                  % "mysql-connector-java"  % MySQLVersion      withSources (),
+    "com.sksamuel.elastic4s" %% "elastic4s-http"       % Elastic4sVersion  withSources (),
+    "io.github.jmcardon"     %% "tsec-password"        % TsecVersion       withSources (),
+    "org.scalacheck"         %% "scalacheck"           % ScalaCheckVersion % Test withSources (),
+    "org.scalatest"          %% "scalatest"            % ScalaTestVersion  % Test withSources (),
   ),
   /*
    * Eliminates useless, unintuitive, and sometimes broken additions of `withFilter`
