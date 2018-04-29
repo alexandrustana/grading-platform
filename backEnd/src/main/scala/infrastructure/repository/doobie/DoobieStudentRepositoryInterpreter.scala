@@ -15,7 +15,7 @@ private object StudentSQL {
   def insert(student: Student): Update0 =
     sql"""
           INSERT INTO STUDENT(ID_ACCOUNT)
-          VALUES(${student.account.id})
+          VALUES(${student.account.get.id})
        """.update
 
   def selectAll: Query0[Student] =

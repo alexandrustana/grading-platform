@@ -15,7 +15,7 @@ private object ProfessorSQL {
   def insert(professor: Professor): Update0 =
     sql"""
           INSERT INTO PROFESSOR(ID_ACCOUNT, TITLE)
-          VALUES(${professor.account.id},
+          VALUES(${professor.account.get.id},
                   ${professor.title})
        """.update
 
