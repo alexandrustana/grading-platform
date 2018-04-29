@@ -32,7 +32,7 @@ object Server extends StreamApp[IO] {
       assignmentValidation = AssignmentValidationInterpreter[F](sqlAssignmentRepo)
       accountService       = AccountService[F](sqlAccountRepo, accountValidation)
       courseService        = CourseService[F](sqlCourseRepo, courseValidation)
-      assignmentService    = AssignmentService[F](sqlAssignmentRepo, assignmentValidation)
+      assignmentService    = AssignmentService[F](sqlAssignmentRepo, courseValidation, assignmentValidation)
       exitCode <- BlazeBuilder[F]
         .bindHttp(8080, "localhost")
         .mountService(AccountEndpoints(accountService), "/")

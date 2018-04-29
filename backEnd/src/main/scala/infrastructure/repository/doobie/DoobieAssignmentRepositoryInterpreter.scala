@@ -3,7 +3,6 @@ package infrastructure.repository.doobie
 import cats._
 import cats.implicits._
 import domain.assignment.{Assignment, AssignmentRepositoryAlgebra}
-import domain.course.Course
 import doobie._
 import doobie.implicits._
 
@@ -19,12 +18,12 @@ private object AssignmentSQL {
           VALUES (${assignment.course.get.id},${assignment.name})
        """.update
 
-  def selectAll: Query0[(Assignment)] =
+  def selectAll: Query0[Assignment] =
     sql"""
-         SELECT A.ID, A.Name , C.ID, C.NAME
+         SELECT *
          FROM ASSIGNMENT AS A
          INNER JOIN COURSE AS C ON A.ID_COURSE = C.ID
-       """.query[(Assignment)]
+       """.query[Assignment]
 }
 
 class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends AssignmentRepositoryAlgebra[F] {

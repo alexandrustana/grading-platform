@@ -5,5 +5,6 @@ package domain
   * @since 07/04/2018
   */
 sealed trait ValidationError extends Product with Serializable
-case class AlreadyExistsError[A](o: A) extends ValidationError
+case class AlreadyExistsError[A](o:  A) extends ValidationError
+case class DoesNotExistError[A](o:   A) extends ValidationError
 case class InvalidModelError(errors: List[String]) extends ValidationError

@@ -20,13 +20,13 @@ private object CourseSQL {
 
   def selectAll: Query0[Course] =
     sql"""
-         SELECT ID, NAME
+         SELECT *
          FROM COURSE
        """.query[Course]
 
   def byName(name: String): Query0[Course] =
     sql"""
-      SELECT ID, NAME
+      SELECT *
       FROM COURSE
       WHERE NAME = $name
     """.query[Course]

@@ -11,13 +11,23 @@ import doobie.implicits._
   * @since 07/04/2018
   */
 private object ProfessorSQL {
-  def insert(professor: Professor): Update0 = ???
 
-  def selectAll: Query0[Professor] = ???
+  def insert(professor: Professor): Update0 =
+    sql"""
+          INSERT INTO PROFESSOR(ID_ACCOUNT, TITLE)
+          VALUES(${professor.account.id},
+                  ${professor.title})
+       """.update
+
+  def selectAll: Query0[Professor] =
+    sql"""
+         SELECT *
+         FROM PROFESSOR AS P
+         INNER JOIN ACCOUNT AS A ON P.ID_ACCOUNT = A.ID
+       """.query[(Professor)]
 }
 
-class DoobieProfessorRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
-    extends ProfessorRepositoryAlgebra[F] {
+class DoobieProfessorRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends ProfessorRepositoryAlgebra[F] {
   import ProfessorSQL._
 
   override def create(o: Professor): F[Professor] =
@@ -26,10 +36,11 @@ class DoobieProfessorRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
       .map(id => o.copy(id = id.some))
       .transact(xa)
 
-  override def getAll: F[List[Professor]] = ???
+  override def getAll: F[List[Professor]] = selectAll.to[List].transact(xa)
 }
 
-object DoobieProfessorRepositoryInterpreter{
+object DoobieProfessorRepositoryInterpreter {
+
   def apply[F[_]: Monad](xa: Transactor[F]): DoobieProfessorRepositoryInterpreter[F] =
     new DoobieProfessorRepositoryInterpreter(xa)
 }

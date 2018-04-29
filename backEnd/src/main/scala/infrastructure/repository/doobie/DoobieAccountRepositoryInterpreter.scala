@@ -23,14 +23,14 @@ private object AccountSQL {
 
   def byEmail(email: String): Query0[Account] =
     sql"""
-         SELECT ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD
+         SELECT *
          FROM ACCOUNT
          WHERE EMAIL = $email
        """.query[Account]
 
   def selectAll: Query0[Account] =
     sql"""
-         SELECT ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD
+         SELECT *
          FROM ACCOUNT
        """.query[Account]
 }
