@@ -28,7 +28,7 @@ object ProfessorValidationInterpreter {
   def apply[F[_]: Monad](repo: ProfessorRepositoryAlgebra[F]): ProfessorValidationInterpreter[F] =
     new ProfessorValidationInterpreter[F](repo)
 
-  private val checkName = checkPred(longerThan(3)("Title") and alphanumeric)
+  private val checkName = checkPred(longerThan(1)("Title") and alphanumeric)
 
   def checkModel(professor: Professor): Either[Errors, Professor] =
     /*_*/
