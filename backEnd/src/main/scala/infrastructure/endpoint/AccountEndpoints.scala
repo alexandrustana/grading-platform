@@ -34,7 +34,7 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
             error match {
               case AlreadyExistsError(existing) =>
                 Conflict(
-                  s"The user with user name ${existing.email} already exists")
+                  s"The user with the email ${existing.asInstanceOf[Account].email} already exists")
               case InvalidModelError(errors) =>
                 Conflict(
                   s"The following errors have occurred when trying to save: ${errors

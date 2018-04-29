@@ -14,6 +14,7 @@ class CourseService[F[_]](accountRepo: CourseRepositoryAlgebra[F],
 
   override def create(o: Course)(implicit M: Monad[F]): EitherT[F, ValidationError, Course] =
     for {
+      _     <- validation.doesNotExist(o)
       _     <- validation.checkModel(o)
       saved <- EitherT.liftF(accountRepo.create(o))
     } yield saved

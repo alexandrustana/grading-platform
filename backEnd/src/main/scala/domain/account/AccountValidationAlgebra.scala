@@ -9,6 +9,6 @@ import domain.{AlreadyExistsError, GenericValidationAlgebra, InvalidModelError}
   */
 trait AccountValidationAlgebra[F[_]]
     extends GenericValidationAlgebra[F, Account] {
-  def doesNotExist(account: Account): EitherT[F, AlreadyExistsError, Unit]
+  def doesNotExist(account: Account): EitherT[F, AlreadyExistsError[Account], Unit]
   def checkModel(account: Account): EitherT[F, InvalidModelError, Unit]
 }

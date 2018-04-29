@@ -19,12 +19,12 @@ private object AssignmentSQL {
           VALUES (${assignment.course.get.id},${assignment.name})
        """.update
 
-  def selectAll: Query0[(Assignment, Option[Course])] =
+  def selectAll: Query0[(Assignment)] =
     sql"""
-         SELECT A.ID, A.NAME
+         SELECT A.ID, A.Name , C.ID, C.NAME
          FROM ASSIGNMENT AS A
          INNER JOIN COURSE AS C ON A.ID_COURSE = C.ID
-       """.query[(Assignment, Option[Course])]
+       """.query[(Assignment)]
 }
 
 class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends AssignmentRepositoryAlgebra[F] {
@@ -40,17 +40,7 @@ class DoobieAssignmentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) 
           .transact(xa)
     }
 
-  override def getAll: F[List[Assignment]] =
-    selectAll
-      .to[List]
-      .transact(xa)
-      .map(_.map {
-        case (a, o) =>
-          o match {
-            case Some(c) => a.copy(course = Option(c))
-            case None    => a
-          }
-      })
+  override def getAll: F[List[Assignment]] = selectAll.to[List].transact(xa)
 }
 
 object DoobieAssignmentRepositoryInterpreter {

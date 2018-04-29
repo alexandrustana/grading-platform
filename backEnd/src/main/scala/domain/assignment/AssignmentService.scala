@@ -8,7 +8,7 @@ import domain.{GenericService, ValidationError}
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 07/04/2018
   */
-class AssignmentService[F[_]](accountRepo: AssignmentRepositoryAlgebra[F],
+class AssignmentService[F[_]](assignmentRepo: AssignmentRepositoryAlgebra[F],
                               validation: AssignmentValidationAlgebra[F])
     extends GenericService[F, Assignment] {
 
@@ -16,11 +16,11 @@ class AssignmentService[F[_]](accountRepo: AssignmentRepositoryAlgebra[F],
       implicit M: Monad[F]): EitherT[F, ValidationError, Assignment] =
     for {
       _ <- validation.checkModel(o)
-      saved <- EitherT.liftF(accountRepo.create(o))
+      saved <- EitherT.liftF(assignmentRepo.create(o))
     } yield saved
 
   override def getAll(implicit M: Monad[F]): EitherT[F, _, List[Assignment]] =
-    EitherT.liftF(accountRepo.getAll)
+    EitherT.liftF(assignmentRepo.getAll)
 }
 
 object AssignmentService {

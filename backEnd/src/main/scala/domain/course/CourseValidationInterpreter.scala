@@ -3,7 +3,7 @@ package domain.course
 import cats._
 import cats.data.EitherT
 import cats.implicits._
-import domain.InvalidModelError
+import domain.{AlreadyExistsError, InvalidModelError}
 import util.Check._
 import util.Check.CheckOps._
 
@@ -11,8 +11,15 @@ import util.Check.CheckOps._
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 07/04/2018
   */
-class CourseValidationInterpreter[F[_]: Monad](accountRepo: CourseRepositoryAlgebra[F])
+class CourseValidationInterpreter[F[_]: Monad](courseRepo: CourseRepositoryAlgebra[F])
     extends CourseValidationAlgebra[F] {
+
+  override def doesNotExist(course: Course) = EitherT {
+    courseRepo.findByName(course.name).map {
+      case None    => Right(())
+      case Some(_) => Left(AlreadyExistsError(course))
+    }
+  }
 
   override def checkModel(course: Course) =
     EitherT.fromEither {

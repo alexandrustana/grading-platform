@@ -3,7 +3,7 @@ package infrastructure.endpoint
 import cats.effect.Effect
 import cats.implicits._
 import domain.course.{Course, CourseService}
-import domain.InvalidModelError
+import domain.{AlreadyExistsError, InvalidModelError}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
@@ -32,6 +32,8 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
           case Right(saved) => Ok(saved.asJson)
           case Left(error) =>
             error match {
+              case AlreadyExistsError(existing) =>
+                Conflict(s"A course with the name ${existing.asInstanceOf[Course].name} already exists")
               case InvalidModelError(errors) =>
                 Conflict(
                   s"The following errors have occurred when trying to save: ${errors
