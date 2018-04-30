@@ -47,7 +47,7 @@ object MapT {
     (a: Map[String, AnyRef]) =>
       Assignment(
         Option(a("id").toString.toLong),
-        a("name").toString
+        name = a("name").toString
     )
 
   implicit val mapToAccountList: MapT[List[Map[String, AnyRef]], List[Account]] =

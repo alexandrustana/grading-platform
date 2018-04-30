@@ -13,8 +13,7 @@ import scala.util.Random
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 11/04/2018
   */
-class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient)
-  extends AccountRepositoryAlgebra[F] {
+class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends AccountRepositoryAlgebra[F] {
 
   import com.sksamuel.elastic4s.http.ElasticDsl._
 
@@ -50,6 +49,7 @@ class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient)
 }
 
 object ElasticAccountRepositoryInterpreter {
+
   def apply[F[_]: Monad](edb: HttpClient): ElasticAccountRepositoryInterpreter[F] =
     new ElasticAccountRepositoryInterpreter(edb)
 }

@@ -3,19 +3,14 @@ package infrastructure.repository.elastic
 import cats.Monad
 import cats.implicits._
 import com.sksamuel.elastic4s.http._
-import domain.account.{Account, AccountRepositoryAlgebra}
 import domain.assignment.{Assignment, AssignmentRepositoryAlgebra}
-import tsec.passwordhashers.imports.BCrypt
 import util.MapT._
-
-import scala.util.Random
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 11/04/2018
   */
-class ElasticAssignmentRepositoryInterpreter[F[_]: Monad](edb: HttpClient)
-  extends AssignmentRepositoryAlgebra[F] {
+class ElasticAssignmentRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends AssignmentRepositoryAlgebra[F] {
 
   import com.sksamuel.elastic4s.http.ElasticDsl._
 
@@ -38,3 +33,8 @@ class ElasticAssignmentRepositoryInterpreter[F[_]: Monad](edb: HttpClient)
     }
 }
 
+object ElasticAssignmentRepositoryInterpreter {
+
+  def apply[F[_]: Monad](edb: HttpClient): ElasticAssignmentRepositoryInterpreter[F] =
+    new ElasticAssignmentRepositoryInterpreter(edb)
+}

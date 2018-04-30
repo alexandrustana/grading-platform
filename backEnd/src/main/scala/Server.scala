@@ -1,14 +1,18 @@
 import cats.effect._
-import config.{BackendConfig,                DatabaseConfig}
-import domain.account.{AccountService,       AccountValidationInterpreter}
+import com.sksamuel.elastic4s.http.HttpClient
+import config.{BackendConfig, DatabaseConfig}
+import domain.account.{AccountService, AccountValidationInterpreter}
 import domain.assignment.{AssignmentService, AssignmentValidationInterpreter}
-import domain.course.{CourseService,         CourseValidationInterpreter}
-import domain.professor.{ProfessorService,   ProfessorValidationInterpreter}
-import domain.student.{StudentService,       StudentValidationInterpreter}
+import domain.course.{CourseService, CourseValidationInterpreter}
+import domain.professor.{ProfessorService, ProfessorValidationInterpreter}
+import domain.student.{StudentService, StudentValidationInterpreter}
+import doobie.hikari.HikariTransactor
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
 import infrastructure.endpoint._
 import infrastructure.repository.doobie._
+import infrastructure.repository.elastic
+import infrastructure.repository.elastic._
 import org.http4s.server.blaze.BlazeBuilder
 
 /**
@@ -25,22 +29,28 @@ object Server extends StreamApp[IO] {
     for {
       conf <- Stream.eval(BackendConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
+      es   <- Stream.eval(DatabaseConfig.initializeElasticDb(conf.db))
       _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
-      sqlAccountRepo       = DoobieAccountRepositoryInterpreter[F](xa)
-      sqlProfessorRepo     = DoobieProfessorRepositoryInterpreter[F](xa)
-      sqlStudentRepo       = DoobieStudentRepositoryInterpreter[F](xa)
-      sqlCourseRepo        = DoobieCourseRepositoryInterpreter[F](xa)
-      sqlAssignmentRepo    = DoobieAssignmentRepositoryInterpreter[F](xa)
-      accountValidation    = AccountValidationInterpreter[F](sqlAccountRepo)
-      professorValidation  = ProfessorValidationInterpreter[F](sqlProfessorRepo)
-      studentValidation    = StudentValidationInterpreter[F](sqlStudentRepo)
-      courseValidation     = CourseValidationInterpreter[F](sqlCourseRepo)
-      assignmentValidation = AssignmentValidationInterpreter[F](sqlAssignmentRepo)
-      accountService       = AccountService[F](sqlAccountRepo, accountValidation)
-      professorService     = ProfessorService[F](sqlProfessorRepo, professorValidation)
-      studentService       = StudentService[F](sqlStudentRepo, studentValidation)
-      courseService        = CourseService[F](sqlCourseRepo, courseValidation)
-      assignmentService    = AssignmentService[F](sqlAssignmentRepo, courseValidation, assignmentValidation)
+      sqlAccountRepo        = DoobieAccountRepositoryInterpreter[F](xa)
+      sqlProfessorRepo      = DoobieProfessorRepositoryInterpreter[F](xa)
+      sqlStudentRepo        = DoobieStudentRepositoryInterpreter[F](xa)
+      sqlCourseRepo         = DoobieCourseRepositoryInterpreter[F](xa)
+      sqlAssignmentRepo     = DoobieAssignmentRepositoryInterpreter[F](xa)
+      elasticAccountRepo    = ElasticAccountRepositoryInterpreter[F](es)
+      elasticProfessorRepo  = ElasticProfessorRepositoryInterpreter[F](es)
+      elasticStudentRepo    = ElasticStudentRepositoryInterpreter[F](es)
+      elasticCourseRepo     = ElasticCourseRepositoryInterpreter[F](es)
+      elasticAssignmentRepo = ElasticAssignmentRepositoryInterpreter[F](es)
+      accountValidation     = AccountValidationInterpreter[F](sqlAccountRepo)
+      professorValidation   = ProfessorValidationInterpreter[F](sqlProfessorRepo)
+      studentValidation     = StudentValidationInterpreter[F](sqlStudentRepo)
+      courseValidation      = CourseValidationInterpreter[F](sqlCourseRepo)
+      assignmentValidation  = AssignmentValidationInterpreter[F](sqlAssignmentRepo)
+      accountService        = AccountService[F](sqlAccountRepo, accountValidation)
+      professorService      = ProfessorService[F](sqlProfessorRepo, professorValidation)
+      studentService        = StudentService[F](sqlStudentRepo, studentValidation)
+      courseService         = CourseService[F](sqlCourseRepo, courseValidation)
+      assignmentService     = AssignmentService[F](sqlAssignmentRepo, courseValidation, assignmentValidation)
       exitCode <- BlazeBuilder[F]
                    .bindHttp(8080, "localhost")
                    .mountService(AccountEndpoints(accountService), "/")
