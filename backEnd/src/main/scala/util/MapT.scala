@@ -2,6 +2,9 @@ package util
 
 import domain.account.Account
 import domain.assignment.Assignment
+import domain.course.Course
+import domain.professor.Professor
+import domain.student.Student
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -20,7 +23,6 @@ object MapT {
   implicit class mapToOps[A](a: A) {
     def mapTo[B](implicit m: MapT[A, B]): B = m.toMap(a)
   }
-
   implicit val accountToMap: MapT[Account, Map[String, Any]] = (a: Account) =>
     Map(
       "id"        -> a.id.get,
@@ -40,6 +42,49 @@ object MapT {
         a("password").toString
     )
 
+  implicit val mapToAccountList: MapT[List[Map[String, AnyRef]], List[Account]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Account])
+
+  implicit val professorToMap: MapT[Professor, Map[String, Any]] = (a: Professor) =>
+    Map("id" -> a.id.get, "title" -> a.title)
+
+  implicit val mapToProfessor: MapT[Map[String, AnyRef], Professor] =
+    (a: Map[String, AnyRef]) =>
+      Professor(
+        Option(a("id").toString.toLong),
+        title = a("title").toString
+    )
+
+  implicit val mapToProfessorList: MapT[List[Map[String, AnyRef]], List[Professor]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Professor])
+
+  implicit val studentToMap: MapT[Student, Map[String, Any]] = (a: Student) => Map("id" -> a.id.get)
+
+  implicit val mapToStudent: MapT[Map[String, AnyRef], Student] =
+    (a: Map[String, AnyRef]) =>
+      Student(
+        Option(a("id").toString.toLong)
+    )
+
+  implicit val mapToStudentList: MapT[List[Map[String, AnyRef]], List[Student]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Student])
+
+  implicit val courseToMap: MapT[Course, Map[String, Any]] = (a: Course) =>
+    Map(
+      "id"   -> a.id.get,
+      "name" -> a.name
+  )
+
+  implicit val mapToCourse: MapT[Map[String, AnyRef], Course] =
+    (a: Map[String, AnyRef]) =>
+      Course(
+        Option(a("id").toString.toLong),
+        a("name").toString
+    )
+
+  implicit val mapToCourseList: MapT[List[Map[String, AnyRef]], List[Course]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Course])
+
   implicit val assignmentToMap: MapT[Assignment, Map[String, Any]] = (a: Assignment) =>
     Map("id" -> a.id.get, "name" -> a.name)
 
@@ -49,10 +94,6 @@ object MapT {
         Option(a("id").toString.toLong),
         name = a("name").toString
     )
-
-  implicit val mapToAccountList: MapT[List[Map[String, AnyRef]], List[Account]] =
-    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Account])
-
 
   implicit val mapToAssignmentList: MapT[List[Map[String, AnyRef]], List[Assignment]] =
     (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Assignment])
