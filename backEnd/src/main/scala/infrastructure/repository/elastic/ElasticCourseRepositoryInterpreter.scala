@@ -6,6 +6,8 @@ import com.sksamuel.elastic4s.http._
 import domain.course.{Course, CourseRepositoryAlgebra}
 import util.MapT._
 
+import scala.util.Random
+
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 30/04/2018
@@ -28,6 +30,7 @@ class ElasticCourseRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends C
   override def create(o: Course): F[Course] =
     edb.execute {
       index("course" -> "type") fields o
+        .copy(id = Option(Random.nextLong))
         .toMap[Map[String, Any]]
     }.await match {
       case Left(e)  => throw new Exception(e.error.reason)

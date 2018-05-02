@@ -34,7 +34,7 @@ object AssignmentValidationInterpreter {
     /*_*/
     (
       Either.right(assignment.id),
-      checkName(assignment.name),
-      Either.right(assignment.course)
+      Either.right(assignment.course),
+      checkName(assignment.name)
     ).mapN(Assignment)
 }

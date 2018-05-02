@@ -39,7 +39,7 @@ val Elastic4sVersion  = "6.1.2"
 val TsecVersion       = "0.0.1-M6"
 
 def commonsSettings: Seq[Setting[_]] = Seq(
-  scalaVersion := "2.12.5",
+  scalaVersion := "2.12.4",
   name         := "grading-platform",
   version      := "0.0.1-SNAPSHOT",
   libraryDependencies ++= Seq(

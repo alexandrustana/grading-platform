@@ -2,7 +2,7 @@ package infrastructure.endpoint
 
 import cats.effect.Effect
 import cats.implicits._
-import domain.course.{Course, CourseService}
+import domain.course.{Course,      CourseService}
 import domain.{AlreadyExistsError, InvalidModelError}
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -16,9 +16,8 @@ import org.http4s.{EntityDecoder, HttpService}
   */
 class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
 
-  implicit val courseDecoder: EntityDecoder[F, Course] = jsonOf[F, Course]
-  implicit val courseListDecoder: EntityDecoder[F, List[Course]] =
-    jsonOf[F, List[Course]]
+  implicit val courseDecoder:     EntityDecoder[F, Course]       = jsonOf[F, Course]
+  implicit val courseListDecoder: EntityDecoder[F, List[Course]] = jsonOf[F, List[Course]]
 
   private def createCourse(courseService: CourseService[F]): HttpService[F] =
     HttpService[F] {
@@ -35,9 +34,8 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
               case AlreadyExistsError(existing) =>
                 Conflict(s"A course with the name ${existing.asInstanceOf[Course].name} already exists")
               case InvalidModelError(errors) =>
-                Conflict(
-                  s"The following errors have occurred when trying to save: ${errors
-                    .mkString(", ")}")
+                Conflict(s"The following errors have occurred when trying to save: ${errors
+                  .mkString(", ")}")
               case _ => InternalServerError("An internal error has occurred")
             }
 
@@ -50,8 +48,7 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         courseService.getAll.value.flatMap {
           case Right(result) => Ok(result.asJson)
           case Left(e) =>
-            InternalServerError(
-              s"An error occurred while trying to retrieve the data: $e")
+            InternalServerError(s"An error occurred while trying to retrieve the data: $e")
         }
     }
 
@@ -61,6 +58,7 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
 }
 
 object CourseEndpoints {
+
   def apply[F[_]: Effect](courseService: CourseService[F]): HttpService[F] =
     new CourseEndpoints[F].endpoints(courseService)
 }

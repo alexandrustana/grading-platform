@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.http._
 import domain.professor.{Professor, ProfessorRepositoryAlgebra}
 import util.MapT._
 
+import scala.util.Random
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 11/04/2018
@@ -17,6 +18,7 @@ class ElasticProfessorRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extend
   override def create(o: Professor): F[Professor] =
     edb.execute {
       index("professor" -> "type") fields o
+        .copy(id = Option(Random.nextLong))
         .toMap[Map[String, Any]]
     }.await match {
       case Left(e)  => throw new Exception(e.error.reason)
