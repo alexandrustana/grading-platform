@@ -24,7 +24,7 @@ private object ProfessorSQL {
          SELECT *
          FROM PROFESSOR AS P
          INNER JOIN ACCOUNT AS A ON P.ID_ACCOUNT = A.ID
-       """.query[(Professor)]
+       """.query[Professor]
 }
 
 class DoobieProfessorRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends ProfessorRepositoryAlgebra[F] {

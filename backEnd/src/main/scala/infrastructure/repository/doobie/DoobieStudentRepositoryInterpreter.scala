@@ -23,7 +23,7 @@ private object StudentSQL {
          SELECT *
          FROM STUDENT AS S
          INNER JOIN ACCOUNT AS A ON S.ID_ACCOUNT = A.ID
-       """.query[(Student)]
+       """.query[Student]
 }
 
 class DoobieStudentRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends StudentRepositoryAlgebra[F] {
