@@ -9,10 +9,10 @@ import domain.student.Student
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 02/05/2018
   */
-case class Submission(
+final case class Submission(
   id:         Option[Long] = None,
   student:    Option[Student] = None,
   assignment: Option[Assignment] = None,
   grade:      Int,
-  time:       LocalDate
+  time:       Long
 )

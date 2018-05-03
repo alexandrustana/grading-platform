@@ -20,12 +20,12 @@ class StudentEndpoints [F[_]: Effect] extends Http4sDsl[F] {
   implicit val studentListDecoder: EntityDecoder[F, List[Student]] = jsonOf[F, List[Student]]
   implicit val accountDecoder:       EntityDecoder[F, Account]         = jsonOf[F, Account]
 
-  private def createUser(professorService: StudentService[F]): HttpService[F] =
+  private def create(studentService: StudentService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "student" =>
         val action = for {
           account <- req.as[Student]
-          result  <- professorService.create(account).value
+          result  <- studentService.create(account).value
         } yield result
 
         action.flatMap {
@@ -44,7 +44,7 @@ class StudentEndpoints [F[_]: Effect] extends Http4sDsl[F] {
         }
     }
 
-  private def getUsers(studentService: StudentService[F]): HttpService[F] =
+  private def getAll(studentService: StudentService[F]): HttpService[F] =
     HttpService[F] {
       case GET -> Root / "student" =>
         studentService.getAll.value.flatMap {
@@ -55,8 +55,8 @@ class StudentEndpoints [F[_]: Effect] extends Http4sDsl[F] {
     }
 
   def endpoints(studentService: StudentService[F]): HttpService[F] =
-    createUser(studentService) <+>
-      getUsers(studentService)
+    create(studentService) <+>
+      getAll(studentService)
 }
 
 object StudentEndpoints {

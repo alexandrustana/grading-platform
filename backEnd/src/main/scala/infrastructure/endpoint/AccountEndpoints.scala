@@ -1,7 +1,7 @@
 package infrastructure.endpoint
 
 import domain.{AlreadyExistsError, InvalidModelError}
-import domain.account.{Account, AccountService}
+import domain.account.{Account,    AccountService}
 import cats.effect.Effect
 import cats.implicits._
 import io.circe.generic.auto._
@@ -20,12 +20,12 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
   implicit val accountListDecoder: EntityDecoder[F, List[Account]] =
     jsonOf[F, List[Account]]
 
-  private def createUser(accountService: AccountService[F]): HttpService[F] =
+  private def create(accountService: AccountService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "account" =>
         val action = for {
           account <- req.as[Account]
-          result <- accountService.create(account).value
+          result  <- accountService.create(account).value
         } yield result
 
         action.flatMap {
@@ -33,34 +33,32 @@ class AccountEndpoints[F[_]: Effect] extends Http4sDsl[F] {
           case Left(error) =>
             error match {
               case AlreadyExistsError(existing) =>
-                Conflict(
-                  s"The user with the email ${existing.asInstanceOf[Account].email} already exists")
+                Conflict(s"The user with the email ${existing.asInstanceOf[Account].email} already exists")
               case InvalidModelError(errors) =>
-                Conflict(
-                  s"The following errors have occurred when trying to save: ${errors
-                    .mkString(", ")}")
+                Conflict(s"The following errors have occurred when trying to save: ${errors
+                  .mkString(", ")}")
             }
 
         }
     }
 
-  private def getUsers(accountService: AccountService[F]): HttpService[F] =
+  private def getAll(accountService: AccountService[F]): HttpService[F] =
     HttpService[F] {
       case GET -> Root / "account" =>
         accountService.getAll.value.flatMap {
           case Right(result) => Ok(result.asJson)
           case Left(e) =>
-            InternalServerError(
-              s"An error occurred while trying to retrieve the data: $e")
+            InternalServerError(s"An error occurred while trying to retrieve the data: $e")
         }
     }
 
   def endpoints(accountService: AccountService[F]): HttpService[F] =
-    createUser(accountService) <+>
-      getUsers(accountService)
+    create(accountService) <+>
+      getAll(accountService)
 }
 
 object AccountEndpoints {
+
   def apply[F[_]: Effect](accountService: AccountService[F]): HttpService[F] =
     new AccountEndpoints[F].endpoints(accountService)
 }

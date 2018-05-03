@@ -21,7 +21,7 @@ class AssignmentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
   implicit val assignmentListDecoder: EntityDecoder[F, List[Assignment]] = jsonOf[F, List[Assignment]]
   implicit val courseDecoder:         EntityDecoder[F, Course]           = jsonOf[F, Course]
 
-  private def createAssignment(assignmentService: AssignmentService[F]): HttpService[F] =
+  private def create(assignmentService: AssignmentService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "assignment" =>
         val action = for {
@@ -42,7 +42,7 @@ class AssignmentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         }
     }
 
-  private def getAssignments(assignmentService: AssignmentService[F]): HttpService[F] =
+  private def getAll(assignmentService: AssignmentService[F]): HttpService[F] =
     HttpService[F] {
       case GET -> Root / "assignment" =>
         assignmentService.getAll.value.flatMap {
@@ -53,8 +53,8 @@ class AssignmentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
     }
 
   def endpoints(assignmentService: AssignmentService[F]): HttpService[F] =
-    createAssignment(assignmentService) <+>
-      getAssignments(assignmentService)
+    create(assignmentService) <+>
+      getAll(assignmentService)
 }
 
 object AssignmentEndpoints {

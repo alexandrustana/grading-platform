@@ -19,7 +19,7 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
   implicit val courseDecoder:     EntityDecoder[F, Course]       = jsonOf[F, Course]
   implicit val courseListDecoder: EntityDecoder[F, List[Course]] = jsonOf[F, List[Course]]
 
-  private def createCourse(courseService: CourseService[F]): HttpService[F] =
+  private def create(courseService: CourseService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "course" =>
         val action = for {
@@ -42,7 +42,7 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         }
     }
 
-  private def getCourses(courseService: CourseService[F]): HttpService[F] =
+  private def getAll(courseService: CourseService[F]): HttpService[F] =
     HttpService[F] {
       case GET -> Root / "course" =>
         courseService.getAll.value.flatMap {
@@ -53,8 +53,8 @@ class CourseEndpoints[F[_]: Effect] extends Http4sDsl[F] {
     }
 
   def endpoints(courseService: CourseService[F]): HttpService[F] =
-    createCourse(courseService) <+>
-      getCourses(courseService)
+    create(courseService) <+>
+      getAll(courseService)
 }
 
 object CourseEndpoints {

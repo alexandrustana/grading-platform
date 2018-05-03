@@ -7,6 +7,7 @@ import cats._
 import cats.data.EitherT
 import cats.implicits._
 import domain.InvalidModelError
+import org.joda.time.DateTime
 import util.Check._
 import util.Predicate
 
@@ -39,11 +40,11 @@ object SubmissionValidationInterpreter {
       )
     )
 
-  def checkDate: Check[LocalDate, LocalDate] =
+  def checkDate: Check[Long, Long] =
     checkPred(
       Predicate.lift(
         error("The submission cannot be made in the past"),
-        time => time.isAfter(LocalDate.now() minus (1, MINUTES))
+        time => new DateTime(time).isAfter(DateTime.now())
       )
     )
 
