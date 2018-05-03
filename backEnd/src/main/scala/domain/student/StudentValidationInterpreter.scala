@@ -11,7 +11,7 @@ import util.Check.CheckOps._
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 30/04/2018
   */
-class StudentValidationInterpreter[F[_]: Monad](professorRepo: StudentRepositoryAlgebra[F])
+class StudentValidationInterpreter[F[_]: Monad](studentRepo: StudentRepositoryAlgebra[F])
     extends StudentValidationAlgebra[F] {
 
   override def checkModel(student: Student) =
@@ -27,8 +27,6 @@ object StudentValidationInterpreter {
 
   def apply[F[_]: Monad](repo: StudentRepositoryAlgebra[F]): StudentValidationInterpreter[F] =
     new StudentValidationInterpreter[F](repo)
-
-  private val checkName = checkPred(longerThan(1)("Title") and alphanumeric)
 
   def checkModel(student: Student): Either[Errors, Student] =
     /*_*/

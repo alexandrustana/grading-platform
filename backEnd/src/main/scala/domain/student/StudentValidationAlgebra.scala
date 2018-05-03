@@ -8,5 +8,5 @@ import domain.{GenericValidationAlgebra, InvalidModelError}
   * @since 30/04/2018
   */
 trait StudentValidationAlgebra[F[_]] extends GenericValidationAlgebra[F, Student] {
-  def checkModel(course: Student): EitherT[F, InvalidModelError, Unit]
+  def checkModel(student: Student): EitherT[F, InvalidModelError, Unit]
 }

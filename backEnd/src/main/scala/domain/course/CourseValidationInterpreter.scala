@@ -45,5 +45,6 @@ object CourseValidationInterpreter {
   private val checkName = checkPred(longerThan(3)("Name") and alphanumeric)
 
   def checkModel(course: Course): Either[Errors, Course] =
+    /*_*/
     (Either.right(course.id), checkName(course.name)).mapN(Course)
 }

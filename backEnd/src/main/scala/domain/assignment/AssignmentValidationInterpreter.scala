@@ -11,7 +11,7 @@ import util.Check.CheckOps._
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 07/04/2018
   */
-class AssignmentValidationInterpreter[F[_]: Monad](accountRepo: AssignmentRepositoryAlgebra[F])
+class AssignmentValidationInterpreter[F[_]: Monad](assignmentRepo: AssignmentRepositoryAlgebra[F])
     extends AssignmentValidationAlgebra[F] {
 
   override def checkModel(assignment: Assignment) =
