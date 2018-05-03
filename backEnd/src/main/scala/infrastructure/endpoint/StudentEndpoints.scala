@@ -3,29 +3,31 @@ package infrastructure.endpoint
 import domain.{AlreadyExistsError, InvalidModelError}
 import cats.effect.Effect
 import cats.implicits._
-import domain.account.Account
+import domain.account.{Account, AccountService}
 import domain.student.{Student, StudentService}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpService}
+
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 30/04/2018
   */
-class StudentEndpoints [F[_]: Effect] extends Http4sDsl[F] {
+class StudentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
 
   implicit val studentDecoder:     EntityDecoder[F, Student]       = jsonOf[F, Student]
   implicit val studentListDecoder: EntityDecoder[F, List[Student]] = jsonOf[F, List[Student]]
-  implicit val accountDecoder:       EntityDecoder[F, Account]         = jsonOf[F, Account]
+  implicit val accountDecoder:     EntityDecoder[F, Account]       = jsonOf[F, Account]
 
-  private def create(studentService: StudentService[F]): HttpService[F] =
+  private def create(studentService: StudentService[F], accountService: AccountService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "student" =>
         val action = for {
-          account <- req.as[Student]
-          result  <- studentService.create(account).value
+          student  <- req.as[Student]
+          accountR <- accountService.create(student.account.get).value
+          result   <- studentService.create(student.copy(account = accountR.toOption)).value
         } yield result
 
         action.flatMap {
@@ -54,13 +56,13 @@ class StudentEndpoints [F[_]: Effect] extends Http4sDsl[F] {
         }
     }
 
-  def endpoints(studentService: StudentService[F]): HttpService[F] =
-    create(studentService) <+>
+  def endpoints(studentService: StudentService[F], accountService: AccountService[F]): HttpService[F] =
+    create(studentService, accountService) <+>
       getAll(studentService)
 }
 
 object StudentEndpoints {
 
-  def apply[F[_]: Effect](studentService: StudentService[F]): HttpService[F] =
-    new StudentEndpoints[F].endpoints(studentService)
+  def apply[F[_]: Effect](studentService: StudentService[F], accountService: AccountService[F]): HttpService[F] =
+    new StudentEndpoints[F].endpoints(studentService, accountService)
 }

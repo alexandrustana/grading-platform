@@ -1,7 +1,5 @@
 package domain.submission
 
-import java.time.LocalDate
-
 import domain.assignment.Assignment
 import domain.student.Student
 

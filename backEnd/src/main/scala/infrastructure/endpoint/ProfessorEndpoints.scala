@@ -3,7 +3,7 @@ package infrastructure.endpoint
 import domain.{AlreadyExistsError, InvalidModelError}
 import cats.effect.Effect
 import cats.implicits._
-import domain.account.Account
+import domain.account.{Account,     AccountService}
 import domain.professor.{Professor, ProfessorService}
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -21,12 +21,13 @@ class ProfessorEndpoints[F[_]: Effect] extends Http4sDsl[F] {
   implicit val professorListDecoder: EntityDecoder[F, List[Professor]] = jsonOf[F, List[Professor]]
   implicit val accountDecoder:       EntityDecoder[F, Account]         = jsonOf[F, Account]
 
-  private def create(professorService: ProfessorService[F]): HttpService[F] =
+  private def create(professorService: ProfessorService[F], accountService: AccountService[F]): HttpService[F] =
     HttpService[F] {
       case req @ POST -> Root / "professor" =>
         val action = for {
-          account <- req.as[Professor]
-          result  <- professorService.create(account).value
+          professor <- req.as[Professor]
+          accountR  <- accountService.create(professor.account.get).value
+          result    <- professorService.create(professor.copy(account = accountR.toOption)).value
         } yield result
 
         action.flatMap {
@@ -38,8 +39,7 @@ class ProfessorEndpoints[F[_]: Effect] extends Http4sDsl[F] {
                   s"The user with the email ${existing.asInstanceOf[Professor].account.get.email} already exists"
                 )
               case InvalidModelError(errors) =>
-                Conflict(s"The following errors have occurred when trying to save: ${errors
-                  .mkString(", ")}")
+                Conflict(s"The following errors have occurred when trying to save: ${errors.mkString(", ")}")
             }
 
         }
@@ -55,13 +55,16 @@ class ProfessorEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         }
     }
 
-  def endpoints(professorService: ProfessorService[F]): HttpService[F] =
-    create(professorService) <+>
+  def endpoints(professorService: ProfessorService[F], accountService: AccountService[F]): HttpService[F] =
+    /*_*/
+    create(professorService, accountService) <+>
       getAll(professorService)
+
+  /*_*/
 }
 
 object ProfessorEndpoints {
 
-  def apply[F[_]: Effect](professorService: ProfessorService[F]): HttpService[F] =
-    new ProfessorEndpoints[F].endpoints(professorService)
+  def apply[F[_]: Effect](professorService: ProfessorService[F], accountService: AccountService[F]): HttpService[F] =
+    new ProfessorEndpoints[F].endpoints(professorService, accountService)
 }

@@ -53,8 +53,8 @@ object Server extends StreamApp[IO] {
       exitCode <- BlazeBuilder[F]
                    .bindHttp(8080, "localhost")
                    .mountService(AccountEndpoints(accountService), "/")
-                   .mountService(ProfessorEndpoints(professorService), "/")
-                   .mountService(StudentEndpoints(studentService), "/")
+                   .mountService(ProfessorEndpoints(professorService, accountService), "/")
+                   .mountService(StudentEndpoints(studentService, accountService), "/")
                    .mountService(CourseEndpoints(courseService), "/")
                    .mountService(AssignmentEndpoints(assignmentService), "/")
                    .mountService(SubmissionEndpoints(submissionService), "/")
