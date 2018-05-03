@@ -5,6 +5,7 @@ import domain.assignment.Assignment
 import domain.course.Course
 import domain.professor.Professor
 import domain.student.Student
+import domain.submission.Submission
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -102,4 +103,25 @@ object MapT {
   implicit val mapToAssignmentList: MapT[List[Map[String, AnyRef]], List[Assignment]] =
     (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Assignment])
 
+  implicit val submissionToMap: MapT[Submission, Map[String, Any]] = (a: Submission) =>
+    Map(
+      "id"         -> a.id.get,
+      "student"    -> a.student.get.toMap[Map[String, Any]],
+      "assignment" -> a.assignment.get.toMap[Map[String, Any]],
+      "grade"      -> a.grade,
+      "time"       -> a.time
+  )
+
+  implicit val mapToSubmission: MapT[Map[String, AnyRef], Submission] =
+    (a: Map[String, AnyRef]) =>
+      Submission(
+        Option(a("id").toString.toLong),
+        Option(a("student").asInstanceOf[Map[String,    AnyRef]].mapTo[Student]),
+        Option(a("assignment").asInstanceOf[Map[String, AnyRef]].mapTo[Assignment]),
+        a("grade").toString.toInt,
+        a("time").toString.toLong
+    )
+
+  implicit val mapToSubmissionList: MapT[List[Map[String, AnyRef]], List[Submission]] =
+    (a: List[Map[String, AnyRef]]) => a map (m => m.mapTo[Submission])
 }
