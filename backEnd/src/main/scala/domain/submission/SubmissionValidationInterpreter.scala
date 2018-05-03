@@ -1,8 +1,5 @@
 package domain.submission
 
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit._
-
 import cats._
 import cats.data.EitherT
 import cats.implicits._

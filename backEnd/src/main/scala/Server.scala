@@ -7,6 +7,7 @@ import domain.assignment.{AssignmentService, AssignmentValidationInterpreter}
 import domain.course.{CourseService,         CourseValidationInterpreter}
 import domain.professor.{ProfessorService,   ProfessorValidationInterpreter}
 import domain.student.{StudentService,       StudentValidationInterpreter}
+import domain.submission.{SubmissionService, SubmissionValidationInterpreter}
 import doobie.hikari.HikariTransactor
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
@@ -36,16 +37,19 @@ object Server extends StreamApp[IO] {
       studentRepo          = studentRepository[F](Right(es))
       courseRepo           = courseRepository[F](Right(es))
       assignmentRepo       = assignmentRepository[F](Right(es))
+      submissionRepo       = submisssionRepository[F](Right(es))
       accountValidation    = AccountValidationInterpreter[F](accountRepo)
       professorValidation  = ProfessorValidationInterpreter[F](professorRepo)
       studentValidation    = StudentValidationInterpreter[F](studentRepo)
       courseValidation     = CourseValidationInterpreter[F](courseRepo)
       assignmentValidation = AssignmentValidationInterpreter[F](assignmentRepo)
+      submissionValidation = SubmissionValidationInterpreter[F](submissionRepo)
       accountService       = AccountService[F](accountRepo, accountValidation)
       professorService     = ProfessorService[F](professorRepo, professorValidation)
       studentService       = StudentService[F](studentRepo, studentValidation)
       courseService        = CourseService[F](courseRepo, courseValidation)
       assignmentService    = AssignmentService[F](assignmentRepo, courseValidation, assignmentValidation)
+      submissionService    = SubmissionService[F](submissionRepo, submissionValidation)
       exitCode <- BlazeBuilder[F]
                    .bindHttp(8080, "localhost")
                    .mountService(AccountEndpoints(accountService), "/")
@@ -53,6 +57,7 @@ object Server extends StreamApp[IO] {
                    .mountService(StudentEndpoints(studentService), "/")
                    .mountService(CourseEndpoints(courseService), "/")
                    .mountService(AssignmentEndpoints(assignmentService), "/")
+                   .mountService(SubmissionEndpoints(submissionService), "/")
                    .serve
     } yield exitCode
 
@@ -79,5 +84,10 @@ object Server extends StreamApp[IO] {
   private def assignmentRepository[F[_]: Monad](conf: Either[HikariTransactor[F], HttpClient]) = conf match {
     case Left(xa)  => DoobieAssignmentRepositoryInterpreter[F](xa)
     case Right(es) => ElasticAssignmentRepositoryInterpreter[F](es)
+  }
+
+  private def submisssionRepository[F[_]: Monad](conf: Either[HikariTransactor[F], HttpClient]) = conf match {
+    case Left(xa)  => DoobieSubmissionRepositoryInterpreter[F](xa)
+    case Right(es) => ElasticSubmissionRepositoryInterpreter[F](es)
   }
 }

@@ -2,10 +2,8 @@ package infrastructure.endpoint
 
 import cats.effect.Effect
 import cats.implicits._
-import domain.course.Course
 import domain.submission.{Submission, SubmissionService}
 import domain.InvalidModelError
-import domain.account.Account
 import domain.assignment.Assignment
 import domain.student.Student
 import io.circe.generic.auto._
