@@ -28,15 +28,16 @@ class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends 
         else Option(v.result.hits.hits(0).sourceAsMap.mapTo[Account]).pure[F]
     }
 
-  override def create(o: Account): F[Account] =
+  override def create(o: Account): F[Account] = {
+    val account = o.copy(password = BCrypt.hashpwUnsafe(o.password).repr, id = Option(Random.nextLong))
     edb.execute {
-      index("account" -> "type") fields o
-        .copy(password = BCrypt.hashpwUnsafe(o.password).repr, id = Option(Random.nextLong))
+      index("account" -> "type") fields account
         .toMap[Map[String, Any]]
     }.await match {
       case Left(e)  => throw new Exception(e.error.reason)
-      case Right(_) => o.pure[F]
+      case Right(_) => account.pure[F]
     }
+  }
 
   override def getAll: F[List[Account]] =
     edb.execute {
