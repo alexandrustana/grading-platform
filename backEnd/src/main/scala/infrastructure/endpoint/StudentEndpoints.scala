@@ -39,7 +39,10 @@ class StudentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
             error match {
               case AlreadyExistsError(existing) =>
                 Conflict(
-                  s"The user with the email ${existing match { case s: Student => s.account.get.email }} already exists"
+                  s"""The user with the email ${existing match {
+                    case s: Student => s.account.get.email
+                    case a: Account   => a.email
+                  }} already exists"""
                 )
               case InvalidModelError(errors) =>
                 Conflict(s"The following errors have occurred when trying to save: ${errors
