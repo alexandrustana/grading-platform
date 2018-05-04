@@ -1,6 +1,6 @@
 package infrastructure.endpoint
 
-import domain.{AlreadyExistsError, InvalidModelError}
+import domain.{AlreadyExistsError, InvalidModelError, ValidationError}
 import cats.effect.Effect
 import cats.implicits._
 import domain.account.{Account, AccountService}
@@ -27,7 +27,10 @@ class StudentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
         val action = for {
           student  <- req.as[Student]
           accountR <- accountService.create(student.account.get).value
-          result   <- studentService.create(student.copy(account = accountR.toOption)).value
+          result <- accountR match {
+                     case Left(v)  => Either.left[ValidationError, Student](v).pure[F]
+                     case Right(v) => studentService.create(student.copy(account = Option(v))).value
+                   }
         } yield result
 
         action.flatMap {
@@ -36,11 +39,12 @@ class StudentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
             error match {
               case AlreadyExistsError(existing) =>
                 Conflict(
-                  s"The user with the email ${existing.asInstanceOf[Student].account.get.email} already exists"
+                  s"The user with the email ${existing match { case s: Student => s.account.get.email }} already exists"
                 )
               case InvalidModelError(errors) =>
                 Conflict(s"The following errors have occurred when trying to save: ${errors
                   .mkString(", ")}")
+              case _ => Conflict("A server error has occurred")
             }
 
         }
@@ -57,8 +61,10 @@ class StudentEndpoints[F[_]: Effect] extends Http4sDsl[F] {
     }
 
   def endpoints(studentService: StudentService[F], accountService: AccountService[F]): HttpService[F] =
+  /*_*/
     create(studentService, accountService) <+>
       getAll(studentService)
+  /*_*/
 }
 
 object StudentEndpoints {
