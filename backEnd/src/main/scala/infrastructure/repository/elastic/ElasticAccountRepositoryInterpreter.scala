@@ -34,7 +34,6 @@ class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends 
       index("account" -> "type") fields account
         .toMap[Map[String, Any]]
     }.await match {
-      case Left(e)  => throw new Exception(e.error.reason)
       case Right(_) => account.pure[F]
     }
   }
@@ -43,7 +42,6 @@ class ElasticAccountRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends 
     edb.execute {
       search("account")
     }.await match {
-      case Left(e) => throw new Exception(e.error.reason)
       case Right(v) =>
         v.result.hits.hits.map(_.sourceAsMap).toList.mapTo[List[Account]].pure[F]
     }

@@ -21,7 +21,6 @@ class ElasticProfessorRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extend
         .copy(id = Option(Random.nextLong))
         .toMap[Map[String, Any]]
     }.await match {
-      case Left(e)  => throw new Exception(e.error.reason)
       case Right(_) => o.pure[F]
     }
 
@@ -29,7 +28,6 @@ class ElasticProfessorRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extend
     edb.execute {
       search("professor")
     }.await match {
-      case Left(e) => throw new Exception(e.error.reason)
       case Right(v) =>
         v.result.hits.hits.map(_.sourceAsMap).toList.mapTo[List[Professor]].pure[F]
     }

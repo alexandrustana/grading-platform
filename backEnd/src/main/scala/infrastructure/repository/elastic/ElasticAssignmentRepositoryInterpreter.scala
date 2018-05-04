@@ -22,7 +22,6 @@ class ElasticAssignmentRepositoryInterpreter[F[_]: Monad](edb: HttpClient) exten
         .copy(id = Option(Random.nextLong))
         .toMap[Map[String, Any]]
     }.await match {
-      case Left(e)  => throw new Exception(e.error.reason)
       case Right(_) => o.pure[F]
     }
 
@@ -30,7 +29,6 @@ class ElasticAssignmentRepositoryInterpreter[F[_]: Monad](edb: HttpClient) exten
     edb.execute {
       search("assignment")
     }.await match {
-      case Left(e) => throw new Exception(e.error.reason)
       case Right(v) =>
         v.result.hits.hits.map(_.sourceAsMap).toList.mapTo[List[Assignment]].pure[F]
     }
