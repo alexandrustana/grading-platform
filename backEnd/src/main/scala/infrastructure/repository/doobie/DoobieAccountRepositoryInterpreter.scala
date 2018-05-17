@@ -12,6 +12,7 @@ import tsec.passwordhashers.imports.BCrypt
   * @since 07/04/2018
   */
 private object AccountSQL {
+
   def insert(account: Account): Update0 =
     sql"""
           INSERT INTO ACCOUNT(FIRST_NAME, LAST_NAME, EMAIL, PASSWORD)
@@ -35,8 +36,7 @@ private object AccountSQL {
        """.query[Account]
 }
 
-class DoobieAccountRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
-    extends AccountRepositoryAlgebra[F] {
+class DoobieAccountRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends AccountRepositoryAlgebra[F] {
   import AccountSQL._
 
   override def create(o: Account): F[Account] =
@@ -52,7 +52,7 @@ class DoobieAccountRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F])
 }
 
 object DoobieAccountRepositoryInterpreter {
-  def apply[F[_]: Monad](
-      xa: Transactor[F]): DoobieAccountRepositoryInterpreter[F] =
+
+  def apply[F[_]: Monad](xa: Transactor[F]): DoobieAccountRepositoryInterpreter[F] =
     new DoobieAccountRepositoryInterpreter(xa)
 }
