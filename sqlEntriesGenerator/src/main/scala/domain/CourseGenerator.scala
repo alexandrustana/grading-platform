@@ -36,5 +36,5 @@ class CourseGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object CourseGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new CourseGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(n: Int) = new CourseGenerator[F](xa).generateEntries(n)
 }

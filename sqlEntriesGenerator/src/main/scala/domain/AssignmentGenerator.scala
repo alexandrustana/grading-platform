@@ -37,5 +37,5 @@ class AssignmentGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object AssignmentGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new AssignmentGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(from: Int, to: Int) = new AssignmentGenerator[F](xa).generateEntries(from, to)
 }

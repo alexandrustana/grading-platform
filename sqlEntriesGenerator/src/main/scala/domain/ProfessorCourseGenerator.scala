@@ -37,5 +37,5 @@ class ProfessorCourseGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object ProfessorCourseGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new ProfessorCourseGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(cFrom: Int, cTo: Int, pFrom: Int, pTo: Int) = new ProfessorCourseGenerator[F](xa).generateEntries(cFrom, cTo, pFrom, pTo)
 }

@@ -50,5 +50,5 @@ class AssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object AssignmentSubmissionGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new AssignmentSubmissionGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(aFrom: Int, aTo: Int, sFrom: Int, sTo: Int) = new AssignmentSubmissionGenerator[F](xa).generateEntries(aFrom, aTo, sFrom, sTo)
 }

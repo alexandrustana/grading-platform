@@ -37,5 +37,5 @@ class StudentGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object StudentGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new StudentGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(from: Int, to: Int) = new StudentGenerator[F](xa).generateEntries(from, to)
 }

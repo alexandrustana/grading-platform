@@ -43,5 +43,5 @@ class AccountGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object AccountGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F]) = new AccountGenerator[F](xa)
+  def apply[F[_]: Monad](xa: Transactor[F])(n: Int) = new AccountGenerator[F](xa).generateEntries(n)
 }
