@@ -15,9 +15,14 @@ import scala.util.Random
   * @author Alexandru Stana, alexandru.stana@busymachines.com
   * @since 19/04/2018
   */
-class AssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) {
+abstract class AssignmentSubmissionGenerator[F[_]: Monad] {
 
-  private type Relation = (Int, Int, Int, String)
+  protected type Relation = (Int, Int, Int, String)
+
+  def generateEntries(aFrom: Int, aTo: Int, sFrom: Int, sTo: Int): F[Int]
+}
+
+class SQLAssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) extends AssignmentSubmissionGenerator[F] {
 
   private def data(a: List[Int], s: List[Int], r: Set[Relation] = Set.empty[Relation]): Set[Relation] = {
     (for {
@@ -50,5 +55,7 @@ class AssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) {
 }
 
 object AssignmentSubmissionGenerator {
-  def apply[F[_]: Monad](xa: Transactor[F])(aFrom: Int, aTo: Int, sFrom: Int, sTo: Int) = new AssignmentSubmissionGenerator[F](xa).generateEntries(aFrom, aTo, sFrom, sTo)
+
+  def apply[F[_]: Monad](xa: Transactor[F])(aFrom: Int, aTo: Int, sFrom: Int, sTo: Int) =
+    new SQLAssignmentSubmissionGenerator[F](xa).generateEntries(aFrom, aTo, sFrom, sTo)
 }

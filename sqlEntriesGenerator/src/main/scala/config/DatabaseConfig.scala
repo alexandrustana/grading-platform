@@ -11,14 +11,14 @@ import org.flywaydb.core.Flyway
   * @since 06/04/2018
   */
 case class DatabaseConfig(
-                           host:     String,
-                           port:     Int,
-                           url:      String,
-                           driver:   String,
-                           user:     String,
-                           password: String,
-                           clean:    Boolean = false
-                         )
+  host:     String,
+  port:     Int,
+  url:      String,
+  driver:   String,
+  user:     String,
+  password: String,
+  clean:    Boolean = false
+)
 
 object DatabaseConfig {
 
@@ -41,4 +41,8 @@ object DatabaseConfig {
     else {
       S.pure(())
     }
+
+  def initializeElasticDb[F[_]](dbConfig: DatabaseConfig)(implicit S: Sync[F]): F[HttpClient] = S.delay {
+    HttpClient(ElasticsearchClientUri(dbConfig.host, dbConfig.port))
+  }
 }

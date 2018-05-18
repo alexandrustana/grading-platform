@@ -15,6 +15,7 @@ object Generator extends App {
     for {
       conf <- Stream.eval(BackendConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
+      es   <- Stream.eval(DatabaseConfig.initializeElasticDb(conf.db))
       _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
       _    <- Stream.eval(AccountGenerator[F](xa)(10))
       _    <- Stream.eval(StudentGenerator[F](xa)(1, 5))
