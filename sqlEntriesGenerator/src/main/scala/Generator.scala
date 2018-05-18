@@ -23,6 +23,7 @@ object Generator extends App {
       _    <- Stream.eval(AssignmentGenerator[F](xa).generateEntries(1, 10))
       _    <- Stream.eval(ProfessorCourseGenerator[F](xa).generateEntries(1, 10, 1, 5))
       _    <- Stream.eval(StudentCourseGenerator[F](xa).generateEntries(1, 10, 1, 5))
+      _    <- Stream.eval(AssignmentSubmissionGenerator[F](xa).generateEntries(1, 10, 1, 5))
     } yield ()
 
 }
