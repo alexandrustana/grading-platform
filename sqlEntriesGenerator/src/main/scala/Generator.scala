@@ -1,6 +1,6 @@
 import cats.effect.{Effect,   IO}
 import config.{BackendConfig, DatabaseConfig}
-import domain.AccountGenerator
+import domain._
 import fs2.Stream
 
 /**
@@ -16,8 +16,13 @@ object Generator extends App {
       conf <- Stream.eval(BackendConfig.load[F])
       xa   <- Stream.eval(DatabaseConfig.dbTransactor(conf.db))
       _    <- Stream.eval(DatabaseConfig.initializeSQLDb(conf.db, xa))
-      _    <- Stream.range(0, 100)
-      acc  <- Stream.eval(AccountGenerator[F](xa).generateAccounts)
-    } yield acc
+      _    <- Stream.eval(AccountGenerator[F](xa).generateEntries(10))
+      _    <- Stream.eval(StudentGenerator[F](xa).generateEntries(1, 5))
+      _    <- Stream.eval(ProfessorGenerator[F](xa).generateEntries(6, 10))
+      _    <- Stream.eval(CourseGenerator[F](xa).generateEntries(10))
+      _    <- Stream.eval(AssignmentGenerator[F](xa).generateEntries(1, 10))
+      _    <- Stream.eval(ProfessorCourseGenerator[F](xa).generateEntries(1, 10, 1, 5))
+      _    <- Stream.eval(StudentCourseGenerator[F](xa).generateEntries(1, 10, 1, 5))
+    } yield ()
 
 }

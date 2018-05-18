@@ -1,13 +1,13 @@
 package domain
 
 import cats.Monad
-import doobie.free.connection.ConnectionIO
+import cats.implicits._
 import doobie.implicits._
-import doobie.util.fragment.Fragment
+import doobie.util.log.LogHandler
 import doobie.util.transactor.Transactor
+import doobie.util.update.Update
 import tsec.passwordhashers.imports.BCrypt
-
-import scala.util.Random
+import util.RandomGenerator
 
 /**
   * @author Alexandru Stana, alexandru.stana@busymachines.com
@@ -15,40 +15,31 @@ import scala.util.Random
   */
 class AccountGenerator[F[_]: Monad](val xa: Transactor[F]) {
 
-  def generateAccounts = {
-    val firstName = randomAlpha
-    val lastName  = randomAlpha
-    val email     = s"$randomAlpha@test.com"
-    val password  = BCrypt.hashpwUnsafe(randomAlphaNumeric).repr
-    sql"""INSERT INTO Account(first_name, last_name, email, password)
-                                     VALUES ($firstName,
-                                              $lastName,
-                                              $email,
-                                              $password)""".stripMargin.update
-      .withGeneratedKeys[Long]("id")
-      .compile
-      .drain
+  private type Account = (String, String, String, String)
+
+  private def data(n: Int): List[Account] =
+    (1 to n)
+      .map(
+        _ =>
+          (
+            RandomGenerator.alpha,
+            RandomGenerator.alpha,
+            s"${RandomGenerator.alpha}@test.com",
+            BCrypt.hashpwUnsafe(RandomGenerator.alphanumeric).repr
+        )
+      )
+      .toList
+
+  private def insertMany(ps: List[Account]) =
+    Update[Account](
+      "INSERT INTO Account(first_name, last_name, email, password) VALUES (?, ?, ?, ?)",
+      logHandler0 = LogHandler.jdkLogHandler
+    ).updateMany(ps)
+
+  def generateEntries(n: Int): F[Int] =
+    insertMany(data(n))
       .transact(xa)
-  }
 
-  private def randomAlpha = {
-    val chars = ('a' to 'z') ++ ('A' to 'Z')
-    randomStringFromCharList(5, chars)
-  }
-
-  private def randomAlphaNumeric = {
-    val chars = ('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')
-    randomStringFromCharList(5, chars)
-  }
-
-  private def randomStringFromCharList(length: Int, chars: Seq[Char]) = {
-    val sb = new StringBuilder
-    for (_ <- 1 to length) {
-      val randomNum = Random.nextInt(chars.length)
-      sb.append(chars(randomNum))
-    }
-    sb.toString
-  }
 }
 
 object AccountGenerator {
