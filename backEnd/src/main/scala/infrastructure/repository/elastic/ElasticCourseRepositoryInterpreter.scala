@@ -4,6 +4,7 @@ import cats.Monad
 import cats.implicits._
 import com.sksamuel.elastic4s.http._
 import domain.course.{Course, CourseRepositoryAlgebra}
+import org.joda.time.DateTime
 import util.MapT._
 
 import scala.util.Random
@@ -42,6 +43,15 @@ class ElasticCourseRepositoryInterpreter[F[_]: Monad](edb: HttpClient) extends C
     }.await match {
       case Right(v) =>
         v.result.hits.hits.map(_.sourceAsMap).toList.mapTo[List[Course]].pure[F]
+    }
+  override def getGrades: F[List[(Double, String)]] =
+    edb.execute {
+      search("submission") query {
+        rangeQuery("time") gte DateTime.now.minusYears(1).getMillis
+      }
+    }.await match {
+      case Right(_) =>
+        List.empty[(Double, String)].pure[F]
     }
 }
 

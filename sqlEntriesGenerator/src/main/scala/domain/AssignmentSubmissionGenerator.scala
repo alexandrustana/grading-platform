@@ -24,7 +24,7 @@ abstract class AssignmentSubmissionGenerator[F[_]: Monad] {
 
 class SQLAssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) extends AssignmentSubmissionGenerator[F] {
 
-  private def data(a: List[Int], s: List[Int], r: Set[Relation] = Set.empty[Relation]): Set[Relation] = {
+  private def data(a: List[Int], s: List[Int]): List[Relation] = {
     (for {
       _ <- 1 to a.length
       _ <- 1 to s.length
@@ -39,13 +39,14 @@ class SQLAssignmentSubmissionGenerator[F[_]: Monad](val xa: Transactor[F]) exten
           Random.nextInt(100 + 1),
           DateTime.now().minusMonths(Random.nextInt(12)).toString("yyyy-MM-dd")
         )
-    }.toSet
+    }.toList
   }
-  private def insertMany(ps: Set[Relation]) =
+
+  private def insertMany(ps: List[Relation]) =
     Update[Relation](
       "INSERT INTO AssignmentSubmission(id_student, id_assignment, grade, time) VALUES (?, ?, ?, ?)",
       logHandler0 = LogHandler.jdkLogHandler
-    ).updateMany(ps.toList)
+    ).updateMany(ps)
 
   def generateEntries(aFrom: Int, aTo: Int, sFrom: Int, sTo: Int): F[Int] = {
     insertMany(data((aFrom to aTo).toList, (sFrom to sTo).toList))

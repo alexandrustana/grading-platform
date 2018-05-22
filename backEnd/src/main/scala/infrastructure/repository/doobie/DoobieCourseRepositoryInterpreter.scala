@@ -30,6 +30,17 @@ private object CourseSQL {
       FROM COURSE
       WHERE NAME = $name
     """.query[Course]
+
+  def getAverageGrades: Query0[(Double, String)] =
+    sql"""
+         |SELECT AVG(ASUB.`grade`) `AVERAGE GRADE`, C.`name` 
+         |	FROM `Course` AS C
+         |	INNER JOIN `Assignment` AS A ON A.`id_course` = C.`id`
+         |	INNER JOIN `AssignmentSubmission` AS ASUB ON ASUB.`id_assignment` = A.`id`
+         |	WHERE YEAR(ASUB.`time`) = YEAR(NOW())
+         |	GROUP BY A.`id_course`
+         |	ORDER BY `AVERAGE GRADE` DESC;
+      """.stripMargin.query[(Double, String)]
 }
 
 class DoobieCourseRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) extends CourseRepositoryAlgebra[F] {
@@ -42,6 +53,8 @@ class DoobieCourseRepositoryInterpreter[F[_]: Monad](val xa: Transactor[F]) exte
       .transact(xa)
 
   override def getAll: F[List[Course]] = selectAll.to[List].transact(xa)
+
+  override def getGrades: F[List[(Double, String)]] = getAverageGrades.to[List].transact(xa)
 
   override def findByName(name: String): F[Option[Course]] = byName(name).option.transact(xa)
 }

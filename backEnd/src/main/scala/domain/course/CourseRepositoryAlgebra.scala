@@ -8,4 +8,5 @@ import domain.GenericRepositoryAlgebra
   */
 trait CourseRepositoryAlgebra[F[_]] extends GenericRepositoryAlgebra[F, Course] {
   def findByName(name: String): F[Option[Course]]
+  def getGrades: F[List[(Double, String)]]
 }
